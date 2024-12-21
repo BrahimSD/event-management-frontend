@@ -1,0 +1,22 @@
+<!-- frontend/src/app/event-list/event-list.component.html -->
+<div class="event-list-container">
+  <h2>Événements</h2>
+  <input
+    type="text"
+    placeholder="Rechercher des événements"
+    [(ngModel)]="searchTerm"
+    (input)="searchEvents()"
+  />
+  <div class="event-cards">
+    <div class="event-card" *ngFor="let event of filteredEvents">
+      <img *ngIf="event.image" [src]="event.image" alt="{{ event.name }}" />
+      <div class="event-details">
+        <h3>{{ event.name }}</h3>
+        <p><strong>Date :</strong> {{ event.date | date }}</p>
+        <p><strong>Lieu :</strong> {{ event.location }}</p>
+        <p>{{ event.description }}</p>
+        <a [routerLink]="['/events', event._id]">Voir les détails</a>
+      </div>
+    </div>
+  </div>
+</div>
