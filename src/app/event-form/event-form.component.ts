@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,11 +13,15 @@ import { AuthService } from '../auth.service';
   imports: [FormsModule, CommonModule]
 })
 export class EventFormComponent implements OnInit {
+  @Output() eventSaved = new EventEmitter<void>();
+
   event: any = {
     name: '',
     description: '',
     date: '',
-    location: ''
+    time: '',
+    location: '',
+    image: null
   };
   isEditMode: boolean = false;
 
@@ -39,15 +43,54 @@ export class EventFormComponent implements OnInit {
   }
 
   saveEvent(): void {
+    if (!this.event.name || !this.event.description || !this.event.date || !this.event.location) {
+      this.validateForm();
+      return;
+    }
+
+    const dateTime = new Date(this.event.date);
+    const [hours, minutes] = this.event.time.split(':');
+    dateTime.setHours(parseInt(hours), parseInt(minutes));
+    
+    const eventData = {
+      ...this.event,
+      date: dateTime.toISOString()
+    };
+
     if (this.isEditMode) {
       const id = this.route.snapshot.paramMap.get('id');
-      this.eventService.updateEvent(id!, this.event).subscribe(() => {
-        this.router.navigate(['/events', id]);
+      this.eventService.updateEvent(id!, eventData).subscribe({
+        next: () => {
+          this.eventSaved.emit();
+        },
+        error: (error) => {
+          console.error('Error updating event:', error);
+        }
       });
     } else {
-      this.eventService.createEvent(this.event).subscribe(() => {
-        this.router.navigate(['/events']);
+      this.eventService.createEvent(eventData).subscribe({
+        next: () => {
+          this.eventSaved.emit();
+          this.event = {
+            name: '',
+            description: '',
+            date: '',
+            time: '',
+            location: '',
+            image: null
+          };
+        },
+        error: (error) => {
+          console.error('Error creating event:', error);
+        }
       });
+    }
+  }
+
+  validateForm(): void {
+    const form = document.querySelector('.event-form') as HTMLFormElement;
+    if (form) {
+      form.classList.add('submitted');
     }
   }
 
@@ -59,6 +102,15 @@ export class EventFormComponent implements OnInit {
         this.event.image = reader.result as string;
       };
       reader.readAsDataURL(file);
+    }
+  }
+
+  cancel() {
+    if (this.isEditMode) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.router.navigate(['/events', id]);
+    } else {
+      this.router.navigate(['/dashboard']);
     }
   }
 }

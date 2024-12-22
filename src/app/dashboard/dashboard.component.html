@@ -1,15 +1,138 @@
-<div class="dashboard-container">
-  <h2>Dashboard</h2>
-  <nav>
-    <button (click)="logout()">Logout</button>
-    <div *ngIf="isOrganizer()">
-      <button (click)="navigateToCreateEvent()">Create New Event</button>
+<div class="top-bar">
+  <div class="left-section">
+    <div class="logo">
+      <i class="fas fa-calendar-alt"></i>
+      <span>Event<strong>MBDS</strong></span>
     </div>
-  </nav>
-  <div *ngIf="isOrganizer()">
-    <p>Welcome Organizer! You can create and manage events.</p>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search events..." [(ngModel)]="searchTerm" (input)="searchEvents()">
+    </div>
+
+    <button *ngIf="isOrganizer()" class="create-event-btn" (click)="createEvent()">
+      <i class="fas fa-plus"></i> Create New Event
+    </button>
   </div>
-  <div *ngIf="!isOrganizer()">
-    <p>Welcome! You can view and register for events.</p>
+
+  <div class="profile-menu" (click)="toggleProfileMenu()" [class.active]="showProfileMenu">
+    <div class="profile-icon">
+      <ng-container *ngIf="!profileImage || profileImage === 'fas fa-user-circle'; else profileAvatar">
+        <i class="fas fa-user-circle"></i>
+      </ng-container>
+      <ng-template #profileAvatar>
+        <img [src]="profileImage" alt="Profile">
+      </ng-template>
+    </div>
+    <div class="profile-dropdown" *ngIf="showProfileMenu">
+      <div class="profile-header">
+        <ng-container *ngIf="!profileImage || profileImage === 'fas fa-user-circle'; else dropdownAvatar">
+          <i class="fas fa-user-circle"></i>
+        </ng-container>
+        <ng-template #dropdownAvatar>
+          <img [src]="profileImage" alt="Profile">
+        </ng-template>
+        <span>{{ username }}</span>
+      </div>
+      <ul>
+        <li (click)="setActiveTab('profile')">
+          <i class="fas fa-user"></i> My Profile
+        </li>
+        <li (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="navigation-menu">
+  <nav>
+    <ul class="main-nav">
+      <li [class.active]="activeTab === 'dashboard'" (click)="setActiveTab('dashboard')">
+        <i class="fas fa-home"></i> Dashboard
+      </li>
+      <li [class.active]="activeTab === 'events'" (click)="setActiveTab('events')">
+        <i class="fas fa-calendar-alt"></i> Events
+      </li>
+      <li [class.active]="activeTab === 'people'" (click)="setActiveTab('people')">
+        <i class="fas fa-users"></i> People
+      </li>
+      <li [class.active]="activeTab === 'messages'" (click)="setActiveTab('messages')">
+        <i class="fas fa-envelope"></i> Messages
+      </li>
+      <li [class.active]="activeTab === 'calendar'" (click)="setActiveTab('calendar')">
+        <i class="fas fa-calendar"></i> Calendar
+      </li>
+      <li [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
+        <i class="fas fa-cog"></i> Settings
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div class="content-container">
+  <!-- Dashboard Content -->
+  <div *ngIf="activeTab === 'dashboard'" class="dashboard-content">
+    <div class="events-list">
+      <div class="event-card" *ngFor="let event of filteredEvents">
+        <img *ngIf="event.image" [src]="event.image" alt="{{ event.name }}">
+        <div class="event-details">
+          <h3>{{ event.name }}</h3>
+          <p><i class="fas fa-calendar"></i> {{ event.date | date }}</p>
+          <p><i class="fas fa-map-marker-alt"></i> {{ event.location }}</p>
+          <p>{{ event.description }}</p>
+          <button [routerLink]="['/events', event._id]" class="view-details">View Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Content -->
+  <div *ngIf="activeTab === 'events'">
+    <app-event-list></app-event-list>
+  </div>
+
+  <!-- People Content -->
+  <div *ngIf="activeTab === 'people'">
+    <h2>People</h2>
+    <!-- Add people content here -->
+  </div>
+
+  <!-- Messages Content -->
+  <div *ngIf="activeTab === 'messages'">
+    <h2>Messages</h2>
+    <!-- Add messages content here -->
+  </div>
+
+  <!-- Calendar Content -->
+  <div *ngIf="activeTab === 'calendar'">
+    <h2>Calendar</h2>
+    <!-- Add calendar content here -->
+  </div>
+
+  <!-- Settings Content -->
+  <div *ngIf="activeTab === 'settings'">
+    <h2>Settings</h2>
+    <!-- Add settings content here -->
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="activeTab === 'profile'">
+    <h2>My Profile</h2>
+    <!-- Add profile content here -->
+  </div>
+</div>
+
+<div class="modal" *ngIf="showEventModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Create New Event</h2>
+      <button class="close-btn" (click)="toggleEventModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <app-event-form (eventSaved)="onEventSaved()"></app-event-form>
+    </div>
   </div>
 </div>

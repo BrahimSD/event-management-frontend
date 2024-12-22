@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -10,40 +10,52 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/auth';
+  private currentUser: any = null;
 
   constructor(
     private http: HttpClient,
     private jwtHelper: JwtHelperService,
     private router: Router
-  ) {}
-
-  login(username: string, password: string): Observable<boolean> {
-    return this.http.post<{ access_token: string; role: string }>(
-      `${this.apiUrl}/login`,
-      { username, password }
-    ).pipe(
-      map((result) => {
-        if (result && result.access_token) {
-          localStorage.setItem('access_token', result.access_token);
-          localStorage.setItem('role', result.role);
-          return true;
-        }
-        return false;
-      })
-    );
+  ) {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      this.currentUser = JSON.parse(userData);
+    }
   }
 
-  register(username: string, password: string, role: string): Observable<boolean> {
-    return this.http.post<{ access_token: string }>(
-      `${this.apiUrl}/register`,
-      { username, password, role }
-    ).pipe(
-      map((result) => {
-        localStorage.setItem('access_token', result.access_token);
-        localStorage.setItem('role', role);
-        return true;
-      })
-    );
+  login(username: string, password: string) {
+    return this.http.post<any>(`${this.apiUrl}/login`, { username, password })
+      .pipe(
+        tap(response => {
+          this.currentUser = {
+            username: response.username,
+            role: response.role,
+            avatar: response.avatar,
+            token: response.access_token
+          };
+          
+          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('role', response.role);
+          localStorage.setItem('user', JSON.stringify(this.currentUser)); // Stocker l'utilisateur complet
+        })
+      );
+  }
+
+  register(userData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, userData)
+      .pipe(
+        tap(response => {
+          if (response.access_token) {
+            this.currentUser = {
+              username: userData.username,
+              role: userData.role,
+              avatar: userData.avatar,
+              token: response.access_token
+            };
+            localStorage.setItem('user', JSON.stringify(this.currentUser));
+          }
+        })
+      );
   }
 
   logout() {
@@ -72,5 +84,14 @@ export class AuthService {
 
   public isOrganizer(): boolean {
     return this.getRole() === 'organizer';
+  }
+
+  getAvatar(): string {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      return user.avatar || 'fas fa-user-circle';
+    }
+    return 'fas fa-user-circle';
   }
 }

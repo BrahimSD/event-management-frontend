@@ -1,15 +1,38 @@
 <div class="register-container">
   <h2>Register</h2>
   <form (submit)="register()">
+    <div class="avatar-upload">
+      <label for="avatar" class="avatar-label">
+        <div class="avatar-preview">
+          <ng-container *ngIf="!avatarPreview; else previewImage">
+            <i class="fas fa-user-circle"></i>
+          </ng-container>
+          <ng-template #previewImage>
+            <img [src]="avatarPreview" alt="Avatar preview">
+          </ng-template>
+        </div>
+        <span>Choose Avatar</span>
+      </label>
+      <input 
+        type="file" 
+        id="avatar" 
+        (change)="onAvatarSelected($event)"
+        accept="image/*"
+        #avatarInput>
+    </div>
+
     <label for="username">Username:</label>
     <input type="text" id="username" [(ngModel)]="username" name="username" required>
+    
     <label for="password">Password:</label>
     <input type="password" id="password" [(ngModel)]="password" name="password" required>
+    
     <label for="role">Role:</label>
     <select id="role" [(ngModel)]="role" name="role" required>
       <option value="participant">Participant</option>
       <option value="organizer">Organizer</option>
     </select>
+    
     <button type="submit">Register</button>
   </form>
   <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

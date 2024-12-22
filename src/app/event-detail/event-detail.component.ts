@@ -16,9 +16,7 @@ export class EventDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
-    private eventService: EventService,
-    private authService: AuthService
+    private eventService: EventService
   ) {}
 
   ngOnInit(): void {
@@ -26,39 +24,5 @@ export class EventDetailComponent implements OnInit {
     this.eventService.getEvent(id!).subscribe(event => {
       this.event = event;
     });
-  }
-
-  deleteEvent(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.eventService.deleteEvent(id!).subscribe(() => {
-      this.router.navigate(['/events']);
-    });
-  }
-
-  canEdit(): boolean {
-    return (
-      this.authService.loggedIn &&
-      this.event.organizer === this.authService.getUsername()
-    );
-  }
-
-  register(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.eventService.registerForEvent(id!).subscribe(() => {
-      this.event.participants.push(this.authService.getUsername());
-    });
-  }
-
-  unregister(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.eventService.unregisterFromEvent(id!).subscribe(() => {
-      this.event.participants = this.event.participants.filter(
-        (user: string) => user !== this.authService.getUsername()
-      );
-    });
-  }
-
-  isRegistered(): boolean {
-    return this.event.participants.includes(this.authService.getUsername());
   }
 }

@@ -18,6 +18,8 @@ export class RegisterComponent {
   password: string = '';
   role: string = 'participant'; 
   errorMessage: string = '';
+  avatarPreview: string | null = null;
+  avatarFile: File | null = null;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -26,16 +28,21 @@ export class RegisterComponent {
       this.errorMessage = 'All fields are required';
       return;
     }
-
-    this.authService.register(this.username, this.password, this.role).subscribe({
+  
+    const userData = {
+      username: this.username,
+      password: this.password,
+      role: this.role,
+      avatar: this.avatarPreview // Include the base64 image data
+    };
+  
+    this.authService.register(userData).subscribe({
       next: () => {
         this.router.navigate(['/login']);
       },
       error: (err) => {
         if (err.status === 409) {
           this.errorMessage = 'Username already exists';
-        } else if (err.status === 400) {
-          this.errorMessage = 'Invalid input';
         } else {
           this.errorMessage = 'Registration failed';
         }
@@ -46,5 +53,17 @@ export class RegisterComponent {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  onAvatarSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.avatarFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.avatarPreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

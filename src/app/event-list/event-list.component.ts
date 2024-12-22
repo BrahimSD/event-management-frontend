@@ -10,11 +10,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './event-list.component.html',
   styleUrls: ['./event-list.component.scss'],
   standalone: true,
-  imports: [
-    RouterModule,
-    CommonModule,
-    FormsModule, 
-  ],
+  imports: [RouterModule, CommonModule, FormsModule],
 })
 export class EventListComponent implements OnInit {
   events: any[] = [];
@@ -28,34 +24,39 @@ export class EventListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
     this.eventService.getEvents().subscribe((events) => {
       this.events = events;
       this.filteredEvents = events;
     });
   }
 
-  searchEvents(): void {
-    if (this.searchTerm) {
-      this.filteredEvents = this.events.filter((event) =>
-        event.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    } else {
-      this.filteredEvents = this.events;
-    }
+  isRegistered(event: any): boolean {
+    const username = this.authService.getUsername();
+    return event.participants?.includes(username) || false;
   }
 
-  viewDetails(id: string): void {
-    this.router.navigate(['/events', id]);
+  register(id: string): void {
+    this.eventService.registerForEvent(id).subscribe(() => {
+      this.loadEvents();
+    });
   }
 
-  editEvent(id: string): void {
-    this.router.navigate(['/events', id, 'edit']);
+  unregister(id: string): void {
+    this.eventService.unregisterFromEvent(id).subscribe(() => {
+      this.loadEvents();
+    });
   }
 
   deleteEvent(id: string): void {
-    this.eventService.deleteEvent(id).subscribe(() => {
-      this.filteredEvents = this.filteredEvents.filter(event => event._id !== id);
-    });
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.eventService.deleteEvent(id).subscribe(() => {
+        this.loadEvents();
+      });
+    }
   }
 
   canEdit(event: any): boolean {
@@ -63,5 +64,16 @@ export class EventListComponent implements OnInit {
       this.authService.loggedIn &&
       event.organizer === this.authService.getUsername()
     );
+  }
+
+  getOrganizerAvatar(username: string): string {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.username === username) {
+        return user.avatar;
+      }
+    }
+    return 'fas fa-user-circle';
   }
 }

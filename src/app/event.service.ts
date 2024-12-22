@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +14,16 @@ export class EventService {
     return this.http.post(this.apiUrl, event);
   }
 
+  searchEvents(searchTerm: string): Observable<any[]> {
+    return this.getEvents().pipe(
+      map(events => events.filter(event => 
+        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase())
+      ))
+    );
+  }
+  
   getEvents(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
