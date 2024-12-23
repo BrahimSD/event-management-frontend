@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { EventService } from '../event.service';
 import { AuthService } from '../auth.service';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-event-list',
@@ -13,6 +14,7 @@ import { AuthService } from '../auth.service';
   imports: [RouterModule, CommonModule, FormsModule],
 })
 export class EventListComponent implements OnInit {
+  private userAvatars = new Map<string, string>();
   events: any[] = [];
   filteredEvents: any[] = [];
   searchTerm: string = '';
@@ -20,6 +22,7 @@ export class EventListComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
@@ -28,10 +31,34 @@ export class EventListComponent implements OnInit {
   }
 
   loadEvents(): void {
-    this.eventService.getEvents().subscribe((events) => {
+    this.eventService.getEvents().subscribe(events => {
       this.events = events;
       this.filteredEvents = events;
+      this.events.forEach(event => {
+        this.loadOrganizerAvatar(event.organizer);
+      });
     });
+  }
+
+  loadOrganizerAvatar(username: string): void {
+    if (!this.userAvatars.has(username)) {
+      this.userService.getUserAvatar(username).subscribe({
+        next: (response) => {
+          if (response && response.avatar) {
+            this.userAvatars.set(username, response.avatar);
+          } else {
+            this.userAvatars.set(username, 'fas fa-user-circle');
+          }
+        },
+        error: () => {
+          this.userAvatars.set(username, 'fas fa-user-circle');
+        }
+      });
+    }
+  }
+
+  getOrganizerAvatar(username: string): string {
+    return this.userAvatars.get(username) || 'fas fa-user-circle';
   }
 
   isRegistered(event: any): boolean {
@@ -64,16 +91,5 @@ export class EventListComponent implements OnInit {
       this.authService.loggedIn &&
       event.organizer === this.authService.getUsername()
     );
-  }
-
-  getOrganizerAvatar(username: string): string {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const user = JSON.parse(userData);
-      if (user.username === username) {
-        return user.avatar;
-      }
-    }
-    return 'fas fa-user-circle';
   }
 }

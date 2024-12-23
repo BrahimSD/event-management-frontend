@@ -1,0 +1,59 @@
+<div class="people-container">
+    <div class="users-grid">
+        <div class="user-card" *ngFor="let user of users" (click)="showUserDetails(user)">
+            <div class="user-avatar">
+                <ng-container *ngIf="!user.avatar; else userAvatar">
+                    <i class="fas fa-user-circle"></i>
+                </ng-container>
+                <ng-template #userAvatar>
+                    <img [src]="user.avatar" alt="{{ user.username }}">
+                </ng-template>
+            </div>
+            <span class="username">{{ user.username }}</span>
+        </div>
+    </div>
+
+    <div class="modal" *ngIf="selectedUser">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>User Profile</h2>
+                <button class="close-btn" (click)="closeUserDetails()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-profile">
+                    <div class="user-avatar-large">
+                        <ng-container *ngIf="!selectedUser.avatar; else selectedUserAvatar">
+                            <i class="fas fa-user-circle"></i>
+                        </ng-container>
+                        <ng-template #selectedUserAvatar>
+                            <img [src]="selectedUser.avatar" alt="{{ selectedUser.username }}">
+                        </ng-template>
+                    </div>
+                    <h3>{{ selectedUser.username }}</h3>
+                    <div class="user-events">
+                        <div class="events-section">
+                            <h4>Created Events</h4>
+                            <div class="events-list">
+                                <div class="event-item" *ngFor="let event of selectedUser.createdEvents">
+                                    <span>{{ event.name }}</span>
+                                    <span>{{ event.date | date }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="events-section">
+                            <h4>Attended Events</h4>
+                            <div class="events-list">
+                                <div class="event-item" *ngFor="let event of selectedUser.attendedEvents">
+                                    <span>{{ event.name }}</span>
+                                    <span>{{ event.date | date }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

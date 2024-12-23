@@ -6,13 +6,25 @@ import { AuthService } from '../auth.service';
 import { EventService } from '../event.service';
 import { EventListComponent } from '../event-list/event-list.component';
 import { EventFormComponent } from '../event-form/event-form.component';
+import { UserService } from '../user.service';
+import { PeopleComponent } from "../people/people.component";
+import { CalendarComponent } from '../calendar/calendar.component';
+
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, EventListComponent, EventFormComponent]
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    EventListComponent, 
+    EventFormComponent, 
+    PeopleComponent,
+    CalendarComponent
+  ]
 })
 export class DashboardComponent implements OnInit {
   searchTerm: string = '';
@@ -23,12 +35,14 @@ export class DashboardComponent implements OnInit {
   events: any[] = [];
   filteredEvents: any[] = [];
   showEventModal = false;
-
+  users: any[] = [];
+  selectedUser: any = null;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private eventService: EventService
+    private eventService: EventService,
+    private userService: UserService
   ) {}
 
   ngOnInit() {

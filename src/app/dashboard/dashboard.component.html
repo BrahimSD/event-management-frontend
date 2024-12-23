@@ -88,14 +88,14 @@
   </div>
 
   <!-- Events Content -->
-  <div *ngIf="activeTab === 'events'">
+  <div *ngIf="activeTab === 'events'" class="events-container">
     <app-event-list></app-event-list>
   </div>
 
   <!-- People Content -->
-  <div *ngIf="activeTab === 'people'">
+  <div *ngIf="activeTab === 'people'" class="people-container">
     <h2>People</h2>
-    <!-- Add people content here -->
+    <app-people></app-people>
   </div>
 
   <!-- Messages Content -->
@@ -105,9 +105,9 @@
   </div>
 
   <!-- Calendar Content -->
-  <div *ngIf="activeTab === 'calendar'">
+  <div *ngIf="activeTab === 'calendar'" class="calendar-container">
     <h2>Calendar</h2>
-    <!-- Add calendar content here -->
+    <app-calendar></app-calendar>
   </div>
 
   <!-- Settings Content -->
