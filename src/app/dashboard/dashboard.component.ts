@@ -9,6 +9,7 @@ import { EventFormComponent } from '../event-form/event-form.component';
 import { UserService } from '../user.service';
 import { PeopleComponent } from "../people/people.component";
 import { CalendarComponent } from '../calendar/calendar.component';
+import { ChatComponent } from '../chat/chat.component';
 
 
 @Component({
@@ -17,14 +18,15 @@ import { CalendarComponent } from '../calendar/calendar.component';
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    FormsModule, 
-    EventListComponent, 
-    EventFormComponent, 
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    EventListComponent,
+    EventFormComponent,
     PeopleComponent,
-    CalendarComponent
-  ]
+    CalendarComponent,
+    ChatComponent
+]
 })
 export class DashboardComponent implements OnInit {
   searchTerm: string = '';

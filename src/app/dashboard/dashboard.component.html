@@ -99,9 +99,8 @@
   </div>
 
   <!-- Messages Content -->
-  <div *ngIf="activeTab === 'messages'">
-    <h2>Messages</h2>
-    <!-- Add messages content here -->
+  <div *ngIf="activeTab === 'messages'" class="messages-container">
+    <app-chat></app-chat>
   </div>
 
   <!-- Calendar Content -->
