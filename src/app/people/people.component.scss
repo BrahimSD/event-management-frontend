@@ -149,11 +149,58 @@
                         .event-item {
                             display: flex;
                             justify-content: space-between;
-                            padding: 0.5rem;
+                            align-items: center;
+                            padding: 1rem;
                             background-color: #f8f9fa;
-                            border-radius: 4px;
-                            font-size: 0.9rem;
-                        }
+                            border-radius: 8px;
+                            margin-bottom: 0.5rem;
+                            transition: transform 0.3s ease;
+                          
+                            &:hover {
+                              transform: translateY(-2px);
+                              background-color: #e9ecef;
+                            }
+                          
+                            .event-info {
+                              display: flex;
+                              flex-direction: column;
+                              gap: 0.5rem;
+                          
+                              .event-name {
+                                font-weight: 500;
+                                color: #2c3e50;
+                              }
+                          
+                              .event-date {
+                                font-size: 0.9rem;
+                                color: #666;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                          
+                                i {
+                                  color: #3498db;
+                                }
+                              }
+                            }
+                          
+                            .view-event {
+                              width: 32px;
+                              height: 32px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              background-color: #3498db;
+                              color: white;
+                              border-radius: 4px;
+                              text-decoration: none;
+                              transition: background-color 0.3s;
+                          
+                              &:hover {
+                                background-color: #2980b9;
+                              }
+                            }
+                          }
                     }
                 }
             }

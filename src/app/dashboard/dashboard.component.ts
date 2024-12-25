@@ -109,4 +109,18 @@ export class DashboardComponent implements OnInit {
   isOrganizer(): boolean {
     return this.authService.getRole() === 'organizer';
   }
+
+  showEventHistory() {
+    this.setActiveTab('people');
+    // Get current user to show their events
+    const username = this.authService.getUsername();
+    if (username) {
+      this.userService.getUserDetails(username).subscribe(
+        (userDetails: any) => {
+          // This will trigger the people component to show the user's events
+          this.selectedUser = userDetails;
+        }
+      );
+    }
+  }
 }

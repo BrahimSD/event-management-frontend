@@ -10,13 +10,14 @@
                 </ng-template>
             </div>
             <span class="username">{{ user.username }}</span>
+            <span class="user-role" *ngIf="isCurrentUser(user.username)">(You)</span>
         </div>
     </div>
 
     <div class="modal" *ngIf="selectedUser">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>User Profile</h2>
+                <h2>User Events</h2>
                 <button class="close-btn" (click)="closeUserDetails()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -31,14 +32,22 @@
                             <img [src]="selectedUser.avatar" alt="{{ selectedUser.username }}">
                         </ng-template>
                     </div>
-                    <h3>{{ selectedUser.username }}</h3>
+                    <h3>{{ selectedUser.username }}'s Events</h3>
                     <div class="user-events">
                         <div class="events-section">
                             <h4>Created Events</h4>
                             <div class="events-list">
                                 <div class="event-item" *ngFor="let event of selectedUser.createdEvents">
-                                    <span>{{ event.name }}</span>
-                                    <span>{{ event.date | date }}</span>
+                                    <div class="event-info">
+                                        <span class="event-name">{{ event.name }}</span>
+                                        <span class="event-date">
+                                            <i class="fas fa-calendar"></i>
+                                            {{ event.date | date }}
+                                        </span>
+                                    </div>
+                                    <a [routerLink]="['/events', event._id]" class="view-event">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -46,8 +55,16 @@
                             <h4>Attended Events</h4>
                             <div class="events-list">
                                 <div class="event-item" *ngFor="let event of selectedUser.attendedEvents">
-                                    <span>{{ event.name }}</span>
-                                    <span>{{ event.date | date }}</span>
+                                    <div class="event-info">
+                                        <span class="event-name">{{ event.name }}</span>
+                                        <span class="event-date">
+                                            <i class="fas fa-calendar"></i>
+                                            {{ event.date | date }}
+                                        </span>
+                                    </div>
+                                    <a [routerLink]="['/events', event._id]" class="view-event">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
