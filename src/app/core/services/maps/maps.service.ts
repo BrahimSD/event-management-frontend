@@ -24,6 +24,7 @@ export class MapsService {
 
     this.loading = new Promise<void>(async (resolve, reject) => {
       try {
+        // Get API key from backend
         const response = await firstValueFrom(this.http.get<{apiKey: string}>(`${this.apiUrl}/maps-key`));
         const uniqueId = `googleMapsCallback_${Math.random().toString(36).substring(7)}`;
         
