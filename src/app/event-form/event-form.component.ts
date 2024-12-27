@@ -1,10 +1,11 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit,Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../event.service';
 import { AuthService } from '../auth.service';
-
+import { LocationService } from '../core/services/location/location.service';
+ 
 @Component({
   selector: 'app-event-form',
   templateUrl: './event-form.component.html',
@@ -12,7 +13,7 @@ import { AuthService } from '../auth.service';
   standalone: true,
   imports: [FormsModule, CommonModule]
 })
-export class EventFormComponent implements OnInit {
+export class EventFormComponent implements OnInit, AfterViewInit {
   @Output() eventSaved = new EventEmitter<void>();
 
   event: any = {
@@ -24,12 +25,14 @@ export class EventFormComponent implements OnInit {
     image: null
   };
   isEditMode: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private eventService: EventService,
-    private authService: AuthService
+    private authService: AuthService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -112,5 +115,27 @@ export class EventFormComponent implements OnInit {
     } else {
       this.router.navigate(['/dashboard']);
     }
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      const input = document.getElementById('location') as HTMLInputElement;
+      if (input) {
+        this.locationService.initGooglePlaces(input, (location: string) => {
+          this.event.location = location;
+        });
+      }
+    }, 1000);
+  }
+
+  getCurrentLocation() {
+    this.locationService.getCurrentLocation(
+      (location: string) => {
+        this.event.location = location;
+      },
+      (error: string) => {
+        this.errorMessage = error;
+      }
+    );
   }
 }

@@ -1,0 +1,69 @@
+<div class="chat-container">
+    <div class="users-list">
+      <div class="search-box">
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search users..." (input)="searchUsers()">
+      </div>
+      <div class="users">
+        <div class="user-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)"
+             [class.active]="selectedUser?.username === user.username">
+          <div class="user-info-wrapper">
+            <div class="user-avatar">
+              <img [src]="user.avatar" *ngIf="user.avatar; else defaultAvatar" [alt]="user.username">
+              <ng-template #defaultAvatar>
+                <i class="fas fa-user-circle"></i>
+              </ng-template>
+              <span class="status-indicator" *ngIf="isUserOnline(user.username)"></span>
+            </div>
+            <div class="user-info">
+              <span class="username">{{user.username}}</span>
+              <span class="status-text" *ngIf="isUserOnline(user.username)">online</span>
+              <div class="last-message" *ngIf="getLastMessage(user)">
+                <div class="message-preview">
+                  <p>{{ getLastMessage(user).content | slice:0:30 }}{{ getLastMessage(user).content.length > 30 ? '...' : '' }}</p>
+                  <span class="message-time">{{ getLastMessage(user).createdAt | date:'shortTime' }}</span>
+                </div>
+                <div class="message-count" *ngIf="getUnreadCount(user) > 0">
+                  {{ getUnreadCount(user) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="chat-content" *ngIf="selectedUser">
+      <div class="chat-header">
+        <div class="user-info-wrapper">
+          <div class="user-avatar">
+            <img [src]="selectedUser.avatar" *ngIf="selectedUser.avatar; else defaultAvatar" [alt]="selectedUser.username">
+            <ng-template #defaultAvatar>
+              <i class="fas fa-user-circle"></i>
+            </ng-template>
+            <span class="status-indicator" *ngIf="isUserOnline(selectedUser.username)"></span>
+          </div>
+          <div class="user-info">
+            <span class="username">{{selectedUser.username}}</span>
+            <span class="status-text" *ngIf="isUserOnline(selectedUser.username)">online</span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="messages" #messageContainer>
+        <div *ngFor="let message of messages" 
+             class="message" 
+             [class.sent]="message.sender.username === currentUser"
+             [class.received]="message.sender.username !== currentUser">
+          <div class="message-content">{{message.content}}</div>
+          <div class="message-time">{{message.createdAt | date:'shortTime'}}</div>
+        </div>
+      </div>
+  
+      <div class="message-input">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keyup.enter)="sendMessage()">
+        <button (click)="sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>

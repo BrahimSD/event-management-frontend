@@ -14,19 +14,19 @@ import { AuthService } from '../auth.service';
   imports: [FormsModule, HttpClientModule, RouterModule, CommonModule]
 })
 export class LoginComponent {
-  username: string = '';
+  identifier: string = '';
   password: string = '';
   errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   login() {
-    this.authService.login(this.username, this.password).subscribe({
+    this.authService.login(this.identifier, this.password).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        this.errorMessage = 'Invalid username or password';
+        this.errorMessage = 'Invalid email/username or password';
       }
     });
   }

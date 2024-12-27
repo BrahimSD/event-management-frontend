@@ -17,7 +17,7 @@
     <div class="modal" *ngIf="selectedUser">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>User Events</h2>
+                <h2>User Profile</h2>
                 <button class="close-btn" (click)="closeUserDetails()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -33,6 +33,21 @@
                         </ng-template>
                     </div>
                     <h3>{{ selectedUser.username }}'s Events</h3>
+
+                     <!-- action buttons -->
+                <div class="user-actions">
+                  <button class="action-btn message-btn" (click)="startChat(selectedUser)">
+                      <i class="fas fa-comment"></i>
+                      Message
+                  </button>
+                  <button class="action-btn follow-btn" 
+                          (click)="toggleFollow(selectedUser)"
+                          [class.following]="isFollowing(selectedUser)">
+                      <i class="fas" [class.fa-user-plus]="!isFollowing(selectedUser)" 
+                         [class.fa-user-check]="isFollowing(selectedUser)"></i>
+                      {{ isFollowing(selectedUser) ? 'Following' : 'Follow' }}
+                  </button>
+              </div>
                     <div class="user-events">
                         <div class="events-section">
                             <h4>Created Events</h4>

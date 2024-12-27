@@ -1,6 +1,6 @@
 <div class="register-container">
-  <h2>Register</h2>
-  <form (submit)="register()">
+  <h2>Create Account</h2>
+  <form (ngSubmit)="register()" #registerForm="ngForm">
     <div class="avatar-upload">
       <label for="avatar" class="avatar-label">
         <div class="avatar-preview">
@@ -21,20 +21,94 @@
         #avatarInput>
     </div>
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" [(ngModel)]="username" name="username" required>
-    
-    <label for="password">Password:</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required>
-    
-    <label for="role">Role:</label>
-    <select id="role" [(ngModel)]="role" name="role" required>
-      <option value="participant">Participant</option>
-      <option value="organizer">Organizer</option>
-    </select>
-    
-    <button type="submit">Register</button>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input 
+        type="text" 
+        id="username" 
+        [(ngModel)]="user.username" 
+        name="username" 
+        required 
+        #username="ngModel"
+        placeholder="Choose a username">
+      <div class="error-feedback" *ngIf="username.invalid && (username.dirty || username.touched)">
+        Username is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input 
+        type="email" 
+        id="email" 
+        [(ngModel)]="user.email" 
+        name="email" 
+        required 
+        email
+        #email="ngModel"
+        placeholder="Enter your email">
+      <div class="error-feedback" *ngIf="email.invalid && (email.dirty || email.touched)">
+        Please enter a valid email address
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input 
+        type="password" 
+        id="password" 
+        [(ngModel)]="user.password" 
+        name="password" 
+        required 
+        minlength="6"
+        #password="ngModel"
+        placeholder="Create a password">
+      <div class="error-feedback" *ngIf="password.invalid && (password.dirty || password.touched)">
+        Password must be at least 6 characters long
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="about">About</label>
+      <textarea 
+        id="about" 
+        [(ngModel)]="user.about" 
+        name="about"
+        rows="3"
+        placeholder="Tell us about yourself"></textarea>
+    </div>
+
+    <div class="form-group location-group">
+      <label for="location">Location <span class="required">*</span></label>
+      <div class="location-input-wrapper">
+        <input 
+          type="text" 
+          id="location" 
+          [(ngModel)]="user.location" 
+          name="location"
+          required
+          #location="ngModel"
+          placeholder="Search for a location in France">
+        <button type="button" class="auto-locate-btn" (click)="getCurrentLocation()" title="Use current location">
+          <i class="fas fa-location-arrow"></i>
+        </button>
+      </div>
+      <div class="error-feedback" *ngIf="location.invalid && (location.dirty || location.touched)">
+        Location is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select id="role" [(ngModel)]="user.role" name="role" required>
+        <option value="participant">Participant</option>
+        <option value="organizer">Organizer</option>
+      </select>
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid">Create Account</button>
   </form>
+
   <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-  <p>Already have an account? <a routerLink="/login">Login here</a></p>
+  <p class="login-link">Already have an account? <a routerLink="/login">Login here</a></p>
 </div>

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
@@ -18,16 +19,28 @@ export class EventListComponent implements OnInit {
   events: any[] = [];
   filteredEvents: any[] = [];
   searchTerm: string = '';
+  private profileSubscription: Subscription;
+
 
   constructor(
     private eventService: EventService,
     private authService: AuthService,
     private userService: UserService,
     private router: Router
-  ) {}
+  ) {
+    this.profileSubscription = this.userService.onProfileUpdate().subscribe(() => {
+      this.loadEvents();
+    });
+  }
 
   ngOnInit(): void {
     this.loadEvents();
+  }
+
+  ngOnDestroy() {
+    if (this.profileSubscription) {
+      this.profileSubscription.unsubscribe();
+    }
   }
 
   loadEvents(): void {

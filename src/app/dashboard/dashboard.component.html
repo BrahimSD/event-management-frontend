@@ -66,8 +66,27 @@
       <li [class.active]="activeTab === 'calendar'" (click)="setActiveTab('calendar')">
         <i class="fas fa-calendar"></i> Calendar
       </li>
-      <li [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
-        <i class="fas fa-cog"></i> Settings
+      <li [class.active]="activeTab === 'settings'" class="settings-menu">
+        <div class="settings-trigger" (click)="toggleSettingsMenu()">
+          <i class="fas fa-cog"></i> Settings
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="settings-dropdown" *ngIf="showSettingsMenu">
+          <ul>
+            <li (click)="setActiveTab('profile')">
+              <i class="fas fa-user-circle"></i>
+              Profile
+            </li>
+            <li (click)="setActiveTab('notifications')">
+              <i class="fas fa-bell"></i>
+              Notifications
+            </li>
+            <li (click)="setActiveTab('personal')">
+              <i class="fas fa-user-cog"></i>
+              Personal
+            </li>
+          </ul>
+        </div>
       </li>
     </ul>
   </nav>
@@ -103,7 +122,7 @@
 
   <!-- Messages Content -->
   <div *ngIf="activeTab === 'messages'" class="messages-container">
-    <app-chat></app-chat>
+    <app-chat [selectedUser]="selectedUser"></app-chat>
   </div>
 
   <!-- Calendar Content -->
@@ -113,16 +132,27 @@
   </div>
 
   <!-- Settings Content -->
-  <div *ngIf="activeTab === 'settings'">
-    <h2>Settings</h2>
-    <!-- Add settings content here -->
+  <div *ngIf="activeTab === 'settings'" class="settings-container">
+   <h2>Settings</h2>
+   <!-- Settings navigation here -->
   </div>
 
-  <!-- Profile Content -->
-  <div *ngIf="activeTab === 'profile'">
-    <h2>My Profile</h2>
-    <!-- Add profile content here -->
-  </div>
+ <!-- Personal Settings Content -->
+ <div *ngIf="activeTab === 'personal'" class="settings-container">
+  <app-personal></app-personal>
+ </div>
+
+ <!-- Notifications Content -->
+<div *ngIf="activeTab === 'notifications'" class="notifications-container">
+  <h2>Notifications</h2>
+  <!-- Add notifications content here -->
+</div>
+
+ <!-- Profile Content -->
+ <div *ngIf="activeTab === 'profile'" class="profile-container">
+  <h2>Profile</h2>
+  <app-profile></app-profile>
+ </div>
 </div>
 
 <div class="modal" *ngIf="showEventModal">

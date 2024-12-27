@@ -43,3 +43,4 @@ Thumbs.db
 
 dist/
 .env
+/src/environments/environment.ts

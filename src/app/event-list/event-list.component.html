@@ -5,7 +5,7 @@
       <div class="event-details">
         <div class="organizer-info">
           <div class="organizer-avatar">
-            <ng-container *ngIf="!getOrganizerAvatar(event.organizer); else organizerAvatar">
+            <ng-container *ngIf="!getOrganizerAvatar(event.organizer) || getOrganizerAvatar(event.organizer) === 'fas fa-user-circle'; else organizerAvatar">
               <i class="fas fa-user-circle"></i>
             </ng-container>
             <ng-template #organizerAvatar>

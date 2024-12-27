@@ -94,4 +94,15 @@ export class AuthService {
     }
     return 'fas fa-user-circle';
   }
+
+  updateUserInfo(user: any) {
+    if (this.currentUser) {
+      this.currentUser = {
+        ...this.currentUser,
+        ...user
+      };
+      localStorage.setItem('user', JSON.stringify(this.currentUser));
+    }
+  }
+  
 }

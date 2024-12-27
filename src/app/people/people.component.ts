@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
+
 
 
 @Component({
@@ -15,14 +16,56 @@ import { AuthService } from '../auth.service';
 export class PeopleComponent implements OnInit {
   users: any[] = [];
   selectedUser: any = null;
+  following: Set<string> = new Set();
 
   constructor(
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.loadUsers();
+    this.loadFollowing();
+  }
+
+  loadFollowing() {
+    const username = this.authService.getUsername();
+    if (username) {
+      this.userService.getUserDetails(username).subscribe(user => {
+        this.following = new Set(user.following?.map((u: any) => u.username) || []);
+      });
+    }
+  }
+
+  startChat(user: any) {
+    // Navigate to messages tab with selected user
+    this.router.navigate(['/dashboard'], { 
+      queryParams: { 
+        tab: 'messages',
+        user: user.username 
+      }
+    });
+  }
+
+  isFollowing(user: any): boolean {
+    return this.following.has(user.username);
+  }
+
+  toggleFollow(user: any) {
+    const isCurrentlyFollowing = this.isFollowing(user);
+    this.userService.toggleFollow(user.username, !isCurrentlyFollowing).subscribe({
+      next: () => {
+        if (isCurrentlyFollowing) {
+          this.following.delete(user.username);
+        } else {
+          this.following.add(user.username);
+        }
+      },
+      error: (error) => {
+        console.error('Error toggling follow:', error);
+      }
+    });
   }
 
   loadUsers() {

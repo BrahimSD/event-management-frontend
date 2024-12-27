@@ -37,13 +37,26 @@
       </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group location-group">
       <label for="location">Location</label>
-      <input type="text" id="location" [(ngModel)]="event.location" name="location" placeholder="Event location"
-        required #location="ngModel">
+      <div class="location-input-wrapper">
+        <input 
+          type="text" 
+          id="location" 
+          [(ngModel)]="event.location" 
+          name="location" 
+          required 
+          #location="ngModel"
+          placeholder="Search for a location in France"
+          autocomplete="off">
+        <button type="button" class="auto-locate-btn" (click)="getCurrentLocation()" title="Use current location">
+          <i class="fas fa-location-arrow"></i>
+        </button>
+      </div>
       <div class="error-message" *ngIf="location.invalid && (location.dirty || location.touched)">
         Location is required
       </div>
+      <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
     </div>
 
     <div class="form-group">

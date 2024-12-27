@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../user.service';
 import { AuthService } from '../auth.service';
 import { ChatService } from '../chat.service';
@@ -8,84 +9,25 @@ import { Socket, io } from 'socket.io-client';
 
 @Component({
   selector: 'app-chat',
+  templateUrl: './chat.component.html',
+  styleUrls: ['./chat.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
-    <div class="chat-container">
-      <div class="users-list">
-        <div class="search-box">
-          <input type="text" [(ngModel)]="searchTerm" placeholder="Search users..." (input)="searchUsers()">
-        </div>
-        <div class="users">
-          <div class="user-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)"
-               [class.active]="selectedUser?.username === user.username">
-            <div class="user-info-wrapper">
-              <div class="user-avatar">
-                <img [src]="user.avatar" *ngIf="user.avatar; else defaultAvatar" [alt]="user.username">
-                <ng-template #defaultAvatar>
-                  <i class="fas fa-user-circle"></i>
-                </ng-template>
-                <span class="status-indicator" *ngIf="isUserOnline(user.username)"></span>
-              </div>
-              <div class="user-info">
-                <span class="username">{{user.username}}</span>
-                <span class="status-text" *ngIf="isUserOnline(user.username)">online</span>
-                <div class="last-message" *ngIf="getLastMessage(user)">
-                  <div class="message-preview">
-                    <p>{{ getLastMessage(user).content | slice:0:30 }}{{ getLastMessage(user).content.length > 30 ? '...' : '' }}</p>
-                    <span class="message-time">{{ getLastMessage(user).createdAt | date:'shortTime' }}</span>
-                  </div>
-                  <div class="message-count" *ngIf="getUnreadCount(user) > 0">
-                    {{ getUnreadCount(user) }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="chat-content" *ngIf="selectedUser">
-        <div class="chat-header">
-          <div class="user-info-wrapper">
-            <div class="user-avatar">
-              <img [src]="selectedUser.avatar" *ngIf="selectedUser.avatar; else defaultAvatar" [alt]="selectedUser.username">
-              <ng-template #defaultAvatar>
-                <i class="fas fa-user-circle"></i>
-              </ng-template>
-              <span class="status-indicator" *ngIf="isUserOnline(selectedUser.username)"></span>
-            </div>
-            <div class="user-info">
-              <span class="username">{{selectedUser.username}}</span>
-              <span class="status-text" *ngIf="isUserOnline(selectedUser.username)">online</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="messages" #messageContainer>
-          <div *ngFor="let message of messages" 
-               class="message" 
-               [class.sent]="message.sender.username === currentUser"
-               [class.received]="message.sender.username !== currentUser">
-            <div class="message-content">{{message.content}}</div>
-            <div class="message-time">{{message.createdAt | date:'shortTime'}}</div>
-          </div>
-        </div>
-
-        <div class="message-input">
-          <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keyup.enter)="sendMessage()">
-          <button (click)="sendMessage()">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  `,
-  styleUrls: ['./chat.component.scss']
+  imports: [CommonModule, FormsModule]
 })
+
 export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('messageContainer') private messageContainer!: ElementRef;
+  @Input() set selectedUser(value: any) {
+    if (value) {
+      this._selectedUser = value;
+      this.loadMessages();
+    }
+  }
+  get selectedUser() {
+    return this._selectedUser;
+  }
   
+  private _selectedUser: any = null;
   private userMessages = new Map<string, any[]>();
   private unreadMessages = new Map<string, number>();
   private lastReadTimes = new Map<string, Date>();
@@ -94,7 +36,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   users: any[] = [];
   filteredUsers: any[] = [];
-  selectedUser: any = null;
   messages: any[] = [];
   newMessage: string = '';
   searchTerm: string = '';
@@ -103,7 +44,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private authService: AuthService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private route: ActivatedRoute
   ) {
     const username = this.authService.getUsername();
     this.currentUser = username || '';
@@ -112,11 +54,22 @@ export class ChatComponent implements OnInit, OnDestroy {
       transports: ['websocket']
     });
   }
-
+  
   ngOnInit() {
     this.loadUsers();
     this.setupSocketListeners();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['user']) {
+        this.userService.getUserDetails(params['user']).subscribe(user => {
+          if (user) {
+            this.selectUser(user);
+          }
+        });
+      }
+    });
   }
+
 
   private setupSocketListeners() {
     this.socket.on('connect', () => {
@@ -124,14 +77,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.socket.emit('join', this.currentUser);
     });
 
-    // Handle initial online users list
     this.socket.on('onlineUsers', (users: string[]) => {
-    // Clear and set all online users
     this.onlineUsers.clear();
     users.forEach(username => this.onlineUsers.add(username));
     });
   
-    // Online status
     this.socket.on('userConnected', (username: string) => {
       this.onlineUsers.add(username);
     });
@@ -141,7 +91,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   
     this.socket.on('newMessage', (message: any) => {
-        // Check if message belongs to current chat
         const isCurrentChat = 
           (message.sender.username === this.currentUser && 
            message.receiver.username === this.selectedUser?.username) ||
@@ -149,7 +98,6 @@ export class ChatComponent implements OnInit, OnDestroy {
            message.receiver.username === this.currentUser);
     
         if (isCurrentChat) {
-          // Only add message if it's from the other user
           if (message.sender.username !== this.currentUser) {
             this.messages.push(message);
             this.scrollToBottom();
@@ -187,10 +135,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     const content = this.newMessage;
     this.newMessage = '';
   
-    // Send through socket only
     this.socket.emit('sendMessage', messageData, (response: any) => {
       if (response) {
-        // Only add message after server confirmation
         this.messages.push({
           _id: response._id,
           sender: { username: this.currentUser },
@@ -209,6 +155,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loadMessages();
     this.lastReadTimes.set(user.username, new Date());
     this.unreadMessages.set(user.username, 0);
+    // Update URL without navigating
+    window.history.replaceState(
+      {}, 
+      '', 
+      `/dashboard?tab=messages&user=${user.username}`
+    );
   }
 
   loadUsers() {

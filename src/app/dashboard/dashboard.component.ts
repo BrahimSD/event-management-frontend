@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
@@ -10,6 +10,8 @@ import { UserService } from '../user.service';
 import { PeopleComponent } from "../people/people.component";
 import { CalendarComponent } from '../calendar/calendar.component';
 import { ChatComponent } from '../chat/chat.component';
+import { ProfileComponent } from '../profile/profile.component';
+import { PersonalComponent } from '../personal/personal.component';
 
 
 @Component({
@@ -25,7 +27,9 @@ import { ChatComponent } from '../chat/chat.component';
     EventFormComponent,
     PeopleComponent,
     CalendarComponent,
-    ChatComponent
+    ChatComponent,
+    ProfileComponent,
+    PersonalComponent
 ]
 })
 export class DashboardComponent implements OnInit {
@@ -39,10 +43,12 @@ export class DashboardComponent implements OnInit {
   showEventModal = false;
   users: any[] = [];
   selectedUser: any = null;
+  showSettingsMenu = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private eventService: EventService,
     private userService: UserService
   ) {}
@@ -51,8 +57,20 @@ export class DashboardComponent implements OnInit {
     this.username = this.authService.getUsername();
     this.profileImage = this.authService.getAvatar();
     this.loadEvents();
-  }
 
+    // Add type for params
+    this.route.queryParams.subscribe((params: { [key: string]: string }) => {
+      if (params['tab']) {
+        this.setActiveTab(params['tab']);
+      }
+      if (params['user']) {
+        this.userService.getUserDetails(params['user']).subscribe(user => {
+          this.selectedUser = user;
+        });
+      }
+    });
+  }
+  
   toggleEventModal() {
     this.showEventModal = !this.showEventModal;
   }
@@ -88,7 +106,10 @@ export class DashboardComponent implements OnInit {
   setActiveTab(tab: string) {
     this.activeTab = tab;
     this.showProfileMenu = false;
-    this.refreshProfile();
+    this.showSettingsMenu = false;
+    if (tab === 'profile') {
+      this.refreshProfile();
+    }
   }
 
   toggleProfileMenu() {
@@ -112,15 +133,20 @@ export class DashboardComponent implements OnInit {
 
   showEventHistory() {
     this.setActiveTab('people');
-    // Get current user to show their events
     const username = this.authService.getUsername();
     if (username) {
       this.userService.getUserDetails(username).subscribe(
         (userDetails: any) => {
-          // This will trigger the people component to show the user's events
           this.selectedUser = userDetails;
         }
       );
+    }
+  }
+
+  toggleSettingsMenu() {
+    this.showSettingsMenu = !this.showSettingsMenu;
+    if (this.showSettingsMenu) {
+      this.showProfileMenu = false;
     }
   }
 }

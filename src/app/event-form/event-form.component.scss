@@ -157,3 +157,64 @@
     }
   }
 }
+
+.location-group {
+  .location-input-wrapper {
+    position: relative;
+    width: 100%;
+
+    input {
+      width: 100%;
+      padding-right: 40px;
+    }
+
+    .auto-locate-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #3498db;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #2980b9;
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.95);
+      }
+
+      &:disabled {
+        color: #bdc3c7;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 16px;
+      }
+    }
+
+    .auto-locate-btn.loading {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: translateY(-50%) rotate(0deg);
+      }
+      to {
+        transform: translateY(-50%) rotate(360deg);
+      }
+    }
+  }
+}
