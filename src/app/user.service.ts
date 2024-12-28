@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable ,catchError} from "rxjs";
 import { map } from 'rxjs/operators';
+import { User, FollowResponse } from "./user.interface";
 
 
 @Injectable({
@@ -62,8 +63,18 @@ export class UserService {
     return this.profileUpdateSubject.asObservable();
   }
 
-  toggleFollow(username: string, shouldFollow: boolean): Observable<any> {
-    const endpoint = shouldFollow ? 'follow' : 'unfollow';
-    return this.http.post<any>(`${this.apiUrl}/${username}/${endpoint}`, {});
+  toggleFollow(username: string, shouldFollow: boolean): Observable<FollowResponse> {
+    if (shouldFollow) {
+      return this.followUser(username);
+    }
+    return this.unfollowUser(username);
+  }
+
+  followUser(username: string): Observable<FollowResponse> {
+    return this.http.post<FollowResponse>(`${this.apiUrl}/${username}/follow`, {});
+  }
+  
+  unfollowUser(username: string): Observable<FollowResponse> {
+    return this.http.post<FollowResponse>(`${this.apiUrl}/${username}/unfollow`, {});
   }
 }
