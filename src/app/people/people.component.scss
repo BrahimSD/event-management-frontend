@@ -1,301 +1,312 @@
 .people-container {
-    padding: 2rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-    .users-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 2rem;
-        padding: 1rem;
-    }
-
-    .user-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-
-        &:hover {
-            transform: translateY(-5px);
-        }
-
-        .user-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-
-            i {
-                font-size: 2.5rem;
-                color: #ccc;
-            }
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-        }
-
-        .username {
-            font-size: 0.9rem;
-            color: #2c3e50;
-            text-align: center;
-        }
-    }
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+  .users-grid {
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
     justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  }
 
-    .modal-content {
-        background: white;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 600px;
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-
-        .modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            h2 {
-                margin: 0;
-            }
-
-            .close-btn {
-                background: none;
-                border: none;
-                font-size: 1.2rem;
-                cursor: pointer;
-                color: #666;
-                padding: 0.5rem;
-
-                &:hover {
-                    color: #333;
-                }
-            }
-        }
-
-        .modal-body {
-            padding: 1rem;
-        }
-
-        .user-profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-
-            .user-avatar-large {
-                width: 150px;
-                height: 150px;
-                border-radius: 50%;
-                overflow: hidden;
-                border: 3px solid #3498db;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                i {
-                    font-size: 4rem;
-                    color: #ccc;
-                }
-
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-            }
-
-            .user-events {
-                width: 100%;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 2rem;
-
-                .events-section {
-                    h4 {
-                        margin-bottom: 1rem;
-                        color: #2c3e50;
-                    }
-
-                    .events-list {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.5rem;
-
-                        .event-item {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 1rem;
-                            background-color: #f8f9fa;
-                            border-radius: 8px;
-                            margin-bottom: 0.5rem;
-                            transition: transform 0.3s ease;
-                          
-                            &:hover {
-                              transform: translateY(-2px);
-                              background-color: #e9ecef;
-                            }
-                          
-                            .event-info {
-                              display: flex;
-                              flex-direction: column;
-                              gap: 0.5rem;
-                          
-                              .event-name {
-                                font-weight: 500;
-                                color: #2c3e50;
-                              }
-                          
-                              .event-date {
-                                font-size: 0.9rem;
-                                color: #666;
-                                display: flex;
-                                align-items: center;
-                                gap: 0.5rem;
-                          
-                                i {
-                                  color: #3498db;
-                                }
-                              }
-                            }
-                          
-                            .view-event {
-                              width: 32px;
-                              height: 32px;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                              background-color: #3498db;
-                              color: white;
-                              border-radius: 4px;
-                              text-decoration: none;
-                              transition: background-color 0.3s;
-                          
-                              &:hover {
-                                background-color: #2980b9;
-                              }
-                            }
-                          }
-                    }
-                }
-            }
-        }
-    }
-}
-
-.user-actions {
+  .user-card {
     display: flex;
-    gap: 1rem;
-    margin: 1rem 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    justify-self: center; // Centrer dans la grille
 
-    .action-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        i {
-            font-size: 1.1rem;
-        }
-
-        &.message-btn {
-            background-color: #3498db;
-            color: white;
-
-            &:hover {
-                background-color: #2980b9;
-            }
-        }
+    &:hover {
+      transform: translateY(-5px);
     }
-}
 
-.user-card {
-    .action-btn {
-      width: auto;
-      min-width: 120px;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      margin-top: 10px;
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #3498db;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      border: none;
-      cursor: pointer;
-  
-      &.follow-btn {
-        background-color: #2196f3;
-        color: white;
-  
+      background-color: #f8f9fa;
+
+      i {
+        font-size: 2.5rem;
+        color: #ccc;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .username {
+      font-size: 0.9rem;
+      color: #2c3e50;
+      text-align: center;
+    }
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+
+    .modal-header {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0.5rem;
+
         &:hover {
-          background-color: #1976d2;
-          transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-  
-        &.following {
-          background-color: #f44336;
-          
-          &:hover {
-            background-color: #d32f2f;
-          }
-  
-          i {
-            margin-right: 4px;
-          }
-        }
-  
-        i {
-          font-size: 16px;
+          color: #333;
         }
       }
     }
-  
-    .user-info {
-      margin-bottom: 12px;
-      text-align: center;
+
+    .modal-body {
+      padding: 1rem;
     }
-  
-    .username {
-      font-weight: 500;
+
+    .user-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+
+      .user-avatar-large {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #3498db;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: 4rem;
+          color: #ccc;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .user-events {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+
+        .events-section {
+          h4 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+          }
+
+          .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .event-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 1rem;
+              background-color: #f8f9fa;
+              border-radius: 8px;
+              margin-bottom: 0.5rem;
+              transition: transform 0.3s ease;
+
+              &:hover {
+                transform: translateY(-2px);
+                background-color: #e9ecef;
+              }
+
+              .event-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .event-name {
+                  font-weight: 500;
+                  color: #2c3e50;
+                }
+
+                .event-date {
+                  font-size: 0.9rem;
+                  color: #666;
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+
+                  i {
+                    color: #3498db;
+                  }
+                }
+              }
+
+              .view-event {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #3498db;
+                color: white;
+                border-radius: 4px;
+                text-decoration: none;
+                transition: background-color 0.3s;
+
+                &:hover {
+                  background-color: #2980b9;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.user-actions {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    i {
       font-size: 1.1rem;
-      margin: 8px 0;
     }
-  
-    .user-role {
-      font-size: 0.9rem;
-      color: #666;
+
+    &.message-btn {
+      background-color: #3498db;
+      color: white;
+
+      &:hover {
+        background-color: #2980b9;
+      }
     }
+  }
+}
+
+.user-card {
+  .action-btn {
+    width: auto;
+    min-width: 120px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+
+    &.follow-btn {
+      background-color: #2196f3;
+      color: white;
+
+      &:hover {
+        background-color: #1976d2;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      &.following {
+        background-color: #f44336;
+
+        &:hover {
+          background-color: #d32f2f;
+        }
+
+        i {
+          margin-right: 4px;
+        }
+      }
+
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .user-info {
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .username {
+    font-weight: 500;
+    font-size: 1.1rem;
+    margin: 8px 0;
+  }
+
+  .user-role {
+    font-size: 0.9rem;
+    color: #666;
+  }
 }

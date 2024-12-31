@@ -12,7 +12,9 @@ import { CalendarComponent } from '../calendar/calendar.component';
 import { ChatComponent } from '../chat/chat.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { PersonalComponent } from '../personal/personal.component';
-
+import { NotificationsComponent } from '../notifications/notifications.component';
+import { NotificationService } from '../services/notification.service';
+import { Notification } from '../notification.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,8 +31,9 @@ import { PersonalComponent } from '../personal/personal.component';
     CalendarComponent,
     ChatComponent,
     ProfileComponent,
-    PersonalComponent
-]
+    PersonalComponent,
+    NotificationsComponent
+  ]
 })
 export class DashboardComponent implements OnInit {
   searchTerm: string = '';
@@ -44,21 +47,23 @@ export class DashboardComponent implements OnInit {
   users: any[] = [];
   selectedUser: any = null;
   showSettingsMenu = false;
+  unreadNotificationsCount: number = 0;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
     private eventService: EventService,
-    private userService: UserService
+    private userService: UserService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.profileImage = this.authService.getAvatar();
     this.loadEvents();
+    this.loadUnreadNotificationsCount();
 
-    // Add type for params
     this.route.queryParams.subscribe((params: { [key: string]: string }) => {
       if (params['tab']) {
         this.setActiveTab(params['tab']);
@@ -148,5 +153,25 @@ export class DashboardComponent implements OnInit {
     if (this.showSettingsMenu) {
       this.showProfileMenu = false;
     }
+  }
+
+  loadUnreadNotificationsCount(): void {
+    const username = this.authService.getUsername();
+    if (username) {
+      this.notificationService.getNotifications(username).subscribe({
+        next: (notifications: Notification[]) => {
+          this.unreadNotificationsCount = notifications.filter((n: Notification) => !n.read).length;
+        },
+        error: (error: Error) => {
+          console.error('Error loading notifications count:', error);
+        }
+      });
+    }
+  }
+
+  goToNotifications(): void {
+    this.setActiveTab('notifications');
+    this.showSettingsMenu = false;
+    this.showProfileMenu = false;
   }
 }

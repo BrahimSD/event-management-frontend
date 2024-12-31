@@ -1,8 +1,20 @@
+.calendar-wrapper{
+    height: calc(100vh - 142px); 
+    overflow: hidden;
+}
+
 .calendar-container {
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    max-width: 1200px;
+    width: 95%;
+    margin: 1rem auto;
     padding: 20px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e1e1;  
 
     .calendar-header {
         margin-bottom: 20px;

@@ -1,0 +1,52 @@
+<div class="notifications-container">
+  <div class="notifications-settings">
+    <h3>Email Notification Settings</h3>
+    <div class="settings-group">
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" [(ngModel)]="emailNotifications.eventReminders"
+            (change)="updateNotificationSettings()">
+          Event Reminders
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" [(ngModel)]="emailNotifications.registrationConfirmation"
+            (change)="updateNotificationSettings()">
+          Registration Confirmations
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" [(ngModel)]="emailNotifications.newEventsFromFollowed"
+            (change)="updateNotificationSettings()">
+          New Events from Followed Organizers
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="notifications-list">
+    <h3>Recent Notifications</h3>
+    <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="!notification.read">
+      <div class="notification-content">
+        <i class="fas" [class.fa-bell]="!notification.read" [class.fa-bell-slash]="notification.read"></i>
+        <div class="notification-text">
+          <p>{{ notification.message }}</p>
+          <span class="notification-time">{{ notification.createdAt | date:'medium' }}</span>
+        </div>
+      </div>
+      <div class="notification-actions">
+        <button *ngIf="!notification.read" (click)="markAsRead(notification._id)" class="btn-mark-read">
+          <i class="fas fa-check"></i>
+        </button>
+        <button (click)="deleteNotification(notification._id)" class="btn-delete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="notifications.length === 0" class="no-notifications">
+      No notifications yet
+    </div>
+  </div>
+</div>

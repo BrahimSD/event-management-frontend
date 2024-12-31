@@ -1,19 +1,30 @@
+<div class="dashboard">
+<div class = "bar">
 <div class="top-bar">
-  <div class="left-section">
-    <div class="logo">
-      <i class="fas fa-calendar-alt"></i>
-      <span>Event<strong>MBDS</strong></span>
-    </div>
-    <div class="search-box">
-      <i class="fas fa-search"></i>
-      <input type="text" placeholder="Search events..." [(ngModel)]="searchTerm" (input)="searchEvents()">
+
+    <div class="left-section">
+      <div class="logo">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Event<strong>MBDS</strong></span>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search events..." [(ngModel)]="searchTerm" (input)="searchEvents()">
+      </div>
+
+      <button *ngIf="isOrganizer()" class="create-event-btn" (click)="createEvent()">
+        <i class="fas fa-plus"></i> Create New Event
+      </button>
     </div>
 
-    <button *ngIf="isOrganizer()" class="create-event-btn" (click)="createEvent()">
-      <i class="fas fa-plus"></i> Create New Event
-    </button>
-  </div>
-
+    <div class="right-section">
+      <!-- Ajouter avant le profile-menu -->
+      <div class="notifications-icon" (click)="goToNotifications()">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" *ngIf="unreadNotificationsCount > 0">
+          {{ unreadNotificationsCount }}
+        </span>
+      </div>
   <div class="profile-menu" (click)="toggleProfileMenu()" [class.active]="showProfileMenu">
     <div class="profile-icon">
       <ng-container *ngIf="!profileImage || profileImage === 'fas fa-user-circle'; else profileAvatar">
@@ -47,6 +58,8 @@
     </div>
   </div>
 </div>
+</div>
+
 
 <div class="navigation-menu">
   <nav>
@@ -91,8 +104,9 @@
     </ul>
   </nav>
 </div>
-
+</div>
 <div class="content-container">
+  <div class="content-wrapper">
   <!-- Dashboard Content -->
   <div *ngIf="activeTab === 'dashboard'" class="dashboard-content">
     <div class="events-list">
@@ -108,7 +122,8 @@
       </div>
     </div>
   </div>
-
+ </div>
+</div>
   <!-- Events Content -->
   <div *ngIf="activeTab === 'events'" class="events-container">
     <app-event-list></app-event-list>
@@ -116,7 +131,6 @@
 
   <!-- People Content -->
   <div *ngIf="activeTab === 'people'" class="people-container">
-    <h2>People</h2>
     <app-people></app-people>
   </div>
 
@@ -127,13 +141,11 @@
 
   <!-- Calendar Content -->
   <div *ngIf="activeTab === 'calendar'" class="calendar-container">
-    <h2>Calendar</h2>
     <app-calendar></app-calendar>
   </div>
 
   <!-- Settings Content -->
   <div *ngIf="activeTab === 'settings'" class="settings-container">
-   <h2>Settings</h2>
    <!-- Settings navigation here -->
   </div>
 
@@ -142,15 +154,13 @@
   <app-personal></app-personal>
  </div>
 
- <!-- Notifications Content -->
+<!-- Notifications Content -->
 <div *ngIf="activeTab === 'notifications'" class="notifications-container">
-  <h2>Notifications</h2>
-  <!-- Add notifications content here -->
+  <app-notifications></app-notifications>
 </div>
 
  <!-- Profile Content -->
  <div *ngIf="activeTab === 'profile'" class="profile-container">
-  <h2>Profile</h2>
   <app-profile></app-profile>
  </div>
 </div>

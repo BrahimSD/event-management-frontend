@@ -1,17 +1,22 @@
 .chat-container {
-    display: flex;
-    height: calc(100vh - 200px);
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  height: calc(100vh - 200px);
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  width: 95%;
+  margin: 1rem auto;
+  border: 1px solid #e1e1e1;
   
     .users-list {
       width: 300px;
       border-right: 1px solid #eee;
       display: flex;
       flex-direction: column;
-  
+      background-color: #f8f9fa;
+      
       .search-box {
         padding: 1rem;
         border-bottom: 1px solid #eee;

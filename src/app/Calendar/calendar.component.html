@@ -1,0 +1,76 @@
+<div class="calendar-wrapper">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button class="view-button" (click)="changeView('dayGridMonth')">Month</button>
+            <button class="view-button" (click)="changeView('timeGridWeek')">Week</button>
+            <button class="view-button" (click)="changeView('timeGridDay')">Day</button>
+        </div>
+        <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" *ngIf="selectedEvent">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Event Details</h2>
+                <button class="close-btn" (click)="closeEventDetails()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>{{ selectedEvent.title }}</h3>
+                <p><i class="fas fa-calendar"></i> {{ selectedEvent.start | date:'EEEE, MMMM d, y' }}</p>
+                <p><i class="fas fa-clock"></i> {{ selectedEvent.start | date:'shortTime' }}</p>
+                <p><i class="fas fa-map-marker-alt"></i> {{ selectedEvent.extendedProps?.location }}</p>
+                <p>{{ selectedEvent.extendedProps?.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div class="modal" *ngIf="showCreateEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Event</h2>
+                <button class="close-btn" (click)="closeCreateEventModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="createEvent()" #eventForm="ngForm">
+                    <div class="form-group">
+                        <label for="title">Event Title</label>
+                        <input type="text" id="title" [(ngModel)]="newEvent.name" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" [(ngModel)]="newEvent.description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" [(ngModel)]="newEvent.location" name="location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Event Image</label>
+                        <div class="image-upload">
+                            <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*"
+                                #imageInput>
+                            <label for="image" class="upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose an image</span>
+                            </label>
+                            <div class="preview-container" *ngIf="newEvent.image">
+                                <img [src]="newEvent.image" alt="Preview" class="image-preview">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" (click)="closeCreateEventModal()">Cancel</button>
+                        <button type="submit" class="btn-submit" [disabled]="!eventForm.form.valid">Create
+                            Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
