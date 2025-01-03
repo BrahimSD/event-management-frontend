@@ -3,6 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../services/notification.service';
 import { AuthService } from '../auth.service';
+import { Notification } from '../notification.interface';
+
+interface NotificationSettings {
+  eventReminders: boolean;
+  registrationConfirmation: boolean;
+  newEventsFromFollowed: boolean;
+}
 
 @Component({
   selector: 'app-notifications',
@@ -12,8 +19,8 @@ import { AuthService } from '../auth.service';
   imports: [CommonModule , FormsModule]
 })
 export class NotificationsComponent implements OnInit {
-  notifications: any[] = [];
-  emailNotifications = {
+  notifications: Notification[] = [];
+  emailNotifications: NotificationSettings = {
     eventReminders: true,
     registrationConfirmation: true,
     newEventsFromFollowed: true
@@ -47,10 +54,10 @@ export class NotificationsComponent implements OnInit {
     const username = this.authService.getUsername();
     if (username) {
       this.notificationService.getNotificationSettings(username).subscribe({
-        next: (settings) => {
+        next: (settings: NotificationSettings) => {
           this.emailNotifications = settings;
         },
-        error: (error) => {
+        error: (error: Error) => {
           console.error('Error loading notification settings:', error);
         }
       });
@@ -64,7 +71,7 @@ export class NotificationsComponent implements OnInit {
         next: () => {
           console.log('Notification settings updated');
         },
-        error: (error) => {
+        error: (error: Error) => {
           console.error('Error updating notification settings:', error);
         }
       });

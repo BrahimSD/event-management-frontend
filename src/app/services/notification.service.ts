@@ -3,40 +3,67 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { Notification } from '../notification.interface';
+import { io, Socket } from 'socket.io-client';
 
+interface NotificationSettings {
+  eventReminders: boolean;
+  registrationConfirmation: boolean;
+  newEventsFromFollowed: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
   private apiUrl = 'http://localhost:3000/notifications';
+  private socket: Socket;
   private notificationCountSubject = new BehaviorSubject<number>(0);
   notificationCount$ = this.notificationCountSubject.asObservable();
 
-
-  constructor(    
+  constructor(
     private http: HttpClient,
     private authService: AuthService
-  ) {}
-
-  getNotifications(username: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${username}`);
+  ) {
+    this.socket = io('http://localhost:3000/notifications');
+    this.setupSocketConnection();
   }
 
-  getNotificationSettings(username: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/settings/${username}`);
+  private setupSocketConnection() {
+    const username = this.authService.getUsername();
+    if (username) {
+      this.socket.emit('join', username);
+      
+      this.socket.on('newNotification', (notification: Notification) => {
+        this.getNotifications(username).subscribe(notifications => {
+          const unreadCount = notifications.filter(n => !n.read).length;
+          this.notificationCountSubject.next(unreadCount);
+        });
+      });
+    }
   }
 
-  updateNotificationSettings(username: string, settings: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/settings/${username}`, settings);
+  getNotifications(username: string): Observable<Notification[]> {
+    return this.http.get<Notification[]>(`${this.apiUrl}/${username}`);
+  }
+
+  getNotificationSettings(username: string): Observable<NotificationSettings> {
+    return this.http.get<NotificationSettings>(`${this.apiUrl}/settings/${username}`);
+  }
+
+  updateNotificationSettings(username: string, settings: NotificationSettings): Observable<NotificationSettings> {
+    return this.http.put<NotificationSettings>(`${this.apiUrl}/settings/${username}`, settings);
   }
 
   markAsRead(notificationId: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${notificationId}/read`, {});
+    const result = this.http.put(`${this.apiUrl}/${notificationId}/read`, {});
+    result.subscribe(() => this.refreshNotificationCount());
+    return result;
   }
 
   deleteNotification(notificationId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${notificationId}`);
+    const result = this.http.delete(`${this.apiUrl}/${notificationId}`);
+    result.subscribe(() => this.refreshNotificationCount());
+    return result;
   }
 
   refreshNotificationCount() {
@@ -46,6 +73,12 @@ export class NotificationService {
         const unreadCount = notifications.filter(n => !n.read).length;
         this.notificationCountSubject.next(unreadCount);
       });
+    }
+  }
+
+  destroy() {
+    if (this.socket) {
+      this.socket.disconnect();
     }
   }
 }

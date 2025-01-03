@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { PersonalComponent } from '../personal/personal.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { NotificationService } from '../services/notification.service';
 import { Notification } from '../notification.interface';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,7 +36,7 @@ import { Notification } from '../notification.interface';
     NotificationsComponent
   ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit , OnDestroy {
   searchTerm: string = '';
   activeTab = 'dashboard';
   showProfileMenu = false;
@@ -48,6 +49,7 @@ export class DashboardComponent implements OnInit {
   selectedUser: any = null;
   showSettingsMenu = false;
   unreadNotificationsCount: number = 0;
+  private notificationSubscription!: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -63,6 +65,11 @@ export class DashboardComponent implements OnInit {
     this.profileImage = this.authService.getAvatar();
     this.loadEvents();
     this.loadUnreadNotificationsCount();
+
+    this.notificationSubscription = this.notificationService.notificationCount$
+      .subscribe(count => {
+        this.unreadNotificationsCount = count;
+      });
 
     this.route.queryParams.subscribe((params: { [key: string]: string }) => {
       if (params['tab']) {
@@ -173,5 +180,12 @@ export class DashboardComponent implements OnInit {
     this.setActiveTab('notifications');
     this.showSettingsMenu = false;
     this.showProfileMenu = false;
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+    this.notificationService.destroy();
   }
 }
