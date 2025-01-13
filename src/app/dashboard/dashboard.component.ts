@@ -36,7 +36,7 @@ import { Subscription } from 'rxjs';
     NotificationsComponent
   ]
 })
-export class DashboardComponent implements OnInit , OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   activeTab = 'dashboard';
   showProfileMenu = false;
@@ -50,6 +50,10 @@ export class DashboardComponent implements OnInit , OnDestroy {
   showSettingsMenu = false;
   unreadNotificationsCount: number = 0;
   private notificationSubscription!: Subscription;
+  upcomingEvents: any[] = [];
+  registeredEvents: any[] = [];
+  createdEvents: any[] = [];
+  followingCount: number = 0;
 
   constructor(
     private authService: AuthService,
@@ -63,9 +67,9 @@ export class DashboardComponent implements OnInit , OnDestroy {
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.profileImage = this.authService.getAvatar();
-    this.loadEvents();
-    this.loadUnreadNotificationsCount();
-
+    this.loadDashboardData();
+    
+    // Subscribe to notifications
     this.notificationSubscription = this.notificationService.notificationCount$
       .subscribe(count => {
         this.unreadNotificationsCount = count;
@@ -82,14 +86,51 @@ export class DashboardComponent implements OnInit , OnDestroy {
       }
     });
   }
-  
+
+  loadDashboardData() {
+    const username = this.authService.getUsername();
+    if (username) {
+      // Load events
+      this.eventService.getEvents().subscribe(events => {
+        const now = new Date();
+        
+        // Filter upcoming events
+        this.upcomingEvents = events
+          .filter(event => new Date(event.date) > now)
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .slice(0, 6);
+
+        // Filter registered events
+        this.registeredEvents = events
+          .filter(event => event.participants?.includes(username))
+          .slice(0, 6);
+
+        // Filter created events
+        this.createdEvents = events
+          .filter(event => event.organizer === username);
+
+        // Set filtered events for search
+        this.events = events;
+        this.filteredEvents = events;
+      });
+
+      // Load following count
+      this.userService.getUserDetails(username).subscribe(user => {
+        this.followingCount = user.following?.length || 0;
+      });
+
+      // Load notifications count
+      this.notificationService.refreshNotificationCount();
+    }
+  }
+
   toggleEventModal() {
     this.showEventModal = !this.showEventModal;
   }
 
   onEventSaved() {
     this.showEventModal = false;
-    this.loadEvents();
+    this.loadDashboardData();
     this.setActiveTab('events');
     this.refreshProfile();
   }
@@ -98,18 +139,13 @@ export class DashboardComponent implements OnInit , OnDestroy {
     this.showEventModal = true;
   }
 
-  loadEvents() {
-    this.eventService.getEvents().subscribe(events => {
-      this.events = events;
-      this.filteredEvents = events;
-    });
-  }
-
   searchEvents() {
     if (this.searchTerm.trim()) {
-      this.eventService.searchEvents(this.searchTerm).subscribe(events => {
-        this.filteredEvents = events;
-      });
+      this.filteredEvents = this.events.filter(event =>
+        event.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        event.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     } else {
       this.filteredEvents = this.events;
     }
@@ -159,20 +195,6 @@ export class DashboardComponent implements OnInit , OnDestroy {
     this.showSettingsMenu = !this.showSettingsMenu;
     if (this.showSettingsMenu) {
       this.showProfileMenu = false;
-    }
-  }
-
-  loadUnreadNotificationsCount(): void {
-    const username = this.authService.getUsername();
-    if (username) {
-      this.notificationService.getNotifications(username).subscribe({
-        next: (notifications: Notification[]) => {
-          this.unreadNotificationsCount = notifications.filter((n: Notification) => !n.read).length;
-        },
-        error: (error: Error) => {
-          console.error('Error loading notifications count:', error);
-        }
-      });
     }
   }
 

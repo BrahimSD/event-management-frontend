@@ -15,6 +15,10 @@
           </div>
           <span class="organizer-name">{{ event.organizer }}</span>
         </div>
+
+        <div class="event-status" [ngClass]="event.status">
+          {{ event.status | uppercase }}
+        </div>
         
         <h3>{{ event.name }}</h3>
         

@@ -1,17 +1,26 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
   private apiUrl = 'http://localhost:3000/events';
+  private eventsUpdated = new Subject<void>();
 
   constructor(private http: HttpClient) {}
 
+  getEventsUpdateListener() {
+    return this.eventsUpdated.asObservable();
+  }
+
   createEvent(event: any): Observable<any> {
-    return this.http.post(this.apiUrl, event);
+    return this.http.post(this.apiUrl, event).pipe(
+      tap(() => {
+        this.eventsUpdated.next();
+      })
+    );
   }
 
   searchEvents(searchTerm: string): Observable<any[]> {

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { EventService } from '../event.service';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
@@ -20,7 +20,7 @@ export class EventListComponent implements OnInit {
   filteredEvents: any[] = [];
   searchTerm: string = '';
   private profileSubscription: Subscription;
-
+  private eventsUpdateSubscription: Subscription;
 
   constructor(
     private eventService: EventService,
@@ -28,18 +28,30 @@ export class EventListComponent implements OnInit {
     private userService: UserService,
     private router: Router
   ) {
-    this.profileSubscription = this.userService.onProfileUpdate().subscribe(() => {
-      this.loadEvents();
-    });
+    this.profileSubscription = this.userService
+      .onProfileUpdate()
+      .subscribe(() => {
+        this.loadEvents();
+      });
+
+    // S'abonner aux mises à jour des événements
+    this.eventsUpdateSubscription = this.eventService
+      .getEventsUpdateListener()
+      .subscribe(() => {
+        this.loadEvents();
+      });
   }
 
   ngOnInit(): void {
     this.loadEvents();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.profileSubscription) {
       this.profileSubscription.unsubscribe();
+    }
+    if (this.eventsUpdateSubscription) {
+      this.eventsUpdateSubscription.unsubscribe();
     }
   }
 
@@ -65,7 +77,7 @@ export class EventListComponent implements OnInit {
         },
         error: () => {
           this.userAvatars.set(username, 'fas fa-user-circle');
-        }
+        },
       });
     }
   }
