@@ -7,7 +7,7 @@ import { EventService } from '../event.service';
 import { EventListComponent } from '../event-list/event-list.component';
 import { EventFormComponent } from '../event-form/event-form.component';
 import { UserService } from '../user.service';
-import { PeopleComponent } from "../people/people.component";
+import { PeopleComponent } from '../people/people.component';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { ChatComponent } from '../chat/chat.component';
 import { ProfileComponent } from '../profile/profile.component';
@@ -33,8 +33,8 @@ import { Subscription } from 'rxjs';
     ChatComponent,
     ProfileComponent,
     PersonalComponent,
-    NotificationsComponent
-  ]
+    NotificationsComponent,
+  ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
@@ -49,11 +49,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedUser: any = null;
   showSettingsMenu = false;
   unreadNotificationsCount: number = 0;
-  private notificationSubscription!: Subscription;
+  private notificationSubscriptions: Subscription[] = [];
+  private notificationInitialized = false;
   upcomingEvents: any[] = [];
   registeredEvents: any[] = [];
   createdEvents: any[] = [];
   followingCount: number = 0;
+  private userAvatars = new Map<string, string>();
 
   constructor(
     private authService: AuthService,
@@ -67,13 +69,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.profileImage = this.authService.getAvatar();
-    this.loadDashboardData();
     
-    // Subscribe to notifications
-    this.notificationSubscription = this.notificationService.notificationCount$
-      .subscribe(count => {
-        this.unreadNotificationsCount = count;
-      });
+    // Initialiser les notifications une seule fois
+    if (!this.notificationInitialized) {
+      this.initializeNotifications();
+      this.notificationInitialized = true;
+    }
+    
+    this.loadDashboardData();
 
     this.route.queryParams.subscribe((params: { [key: string]: string }) => {
       if (params['tab']) {
@@ -87,40 +90,88 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  private initializeNotifications() {
+    // Souscrire aux notifications une seule fois
+    this.notificationSubscriptions.push(
+      this.notificationService.notificationCount$.subscribe(count => {
+        this.unreadNotificationsCount = count;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    // Nettoyer toutes les souscriptions
+    if (this.notificationSubscriptions) {
+      this.notificationSubscriptions.forEach(sub => sub.unsubscribe());
+    }
+    this.notificationInitialized = false;
+    this.notificationService.destroy();
+  }
+
   loadDashboardData() {
     const username = this.authService.getUsername();
     if (username) {
-      // Load events
-      this.eventService.getEvents().subscribe(events => {
-        const now = new Date();
-        
-        // Filter upcoming events
-        this.upcomingEvents = events
-          .filter(event => new Date(event.date) > now)
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          .slice(0, 6);
+      // Charger les événements une seule fois
+      this.notificationSubscriptions.push(
+        this.eventService.getEvents().subscribe((events) => {
+          const now = new Date();
 
-        // Filter registered events
-        this.registeredEvents = events
-          .filter(event => event.participants?.includes(username))
-          .slice(0, 6);
+          this.upcomingEvents = events
+            .filter((event) => {
+              const eventDate = new Date(event.date);
+              return eventDate > now && event.status === 'upcoming';
+            })
+            .sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            )
+            .slice(0, 6);
 
-        // Filter created events
-        this.createdEvents = events
-          .filter(event => event.organizer === username);
+          // Load avatars for organizers
+          this.upcomingEvents.forEach((event) => {
+            this.loadOrganizerAvatar(event.organizer);
+          });
 
-        // Set filtered events for search
-        this.events = events;
-        this.filteredEvents = events;
-      });
+          this.registeredEvents = events.filter(
+            (event) =>
+              event.participants?.includes(username) &&
+              event.status !== 'completed'
+          );
 
-      // Load following count
-      this.userService.getUserDetails(username).subscribe(user => {
-        this.followingCount = user.following?.length || 0;
-      });
+          this.createdEvents = events.filter(
+            (event) => event.organizer === username
+          );
 
-      // Load notifications count
+          this.events = this.upcomingEvents;
+          this.filteredEvents = this.upcomingEvents;
+        })
+      );
+
+      // Charger le nombre d'abonnements une seule fois
+      this.notificationSubscriptions.push(
+        this.userService.getUserDetails(username).subscribe((user) => {
+          this.followingCount = user.following?.length || 0;
+        })
+      );
+
+      // Ne rafraîchir le compte de notifications qu'une seule fois au chargement
       this.notificationService.refreshNotificationCount();
+    }
+  }
+
+  loadOrganizerAvatar(username: string): void {
+    if (!this.userAvatars.has(username)) {
+      this.userService.getUserAvatar(username).subscribe({
+        next: (response) => {
+          if (response && response.avatar) {
+            this.userAvatars.set(username, response.avatar);
+          } else {
+            this.userAvatars.set(username, 'fas fa-user-circle');
+          }
+        },
+        error: () => {
+          this.userAvatars.set(username, 'fas fa-user-circle');
+        },
+      });
     }
   }
 
@@ -141,10 +192,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   searchEvents() {
     if (this.searchTerm.trim()) {
-      this.filteredEvents = this.events.filter(event =>
-        event.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        event.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        event.location.toLowerCase().includes(this.searchTerm.toLowerCase())
+      this.filteredEvents = this.events.filter(
+        (event) =>
+          event.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          event.description
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase()) ||
+          event.location.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     } else {
       this.filteredEvents = this.events;
@@ -157,6 +211,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showSettingsMenu = false;
     if (tab === 'profile') {
       this.refreshProfile();
+    }
+    if (tab === 'notifications') {
+      this.notificationService.refreshNotificationCount();
     }
   }
 
@@ -183,11 +240,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.setActiveTab('people');
     const username = this.authService.getUsername();
     if (username) {
-      this.userService.getUserDetails(username).subscribe(
-        (userDetails: any) => {
+      this.userService
+        .getUserDetails(username)
+        .subscribe((userDetails: any) => {
           this.selectedUser = userDetails;
-        }
-      );
+        });
     }
   }
 
@@ -204,10 +261,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showProfileMenu = false;
   }
 
-  ngOnDestroy() {
-    if (this.notificationSubscription) {
-      this.notificationSubscription.unsubscribe();
-    }
-    this.notificationService.destroy();
+  getOrganizerAvatar(username: string): string {
+    return this.userAvatars.get(username) || 'fas fa-user-circle';
+  }
+
+  isRegistered(event: any): boolean {
+    const username = this.authService.getUsername();
+    return event.participants?.includes(username) || false;
+  }
+
+  register(id: string): void {
+    this.eventService.registerForEvent(id).subscribe(() => {
+      this.loadDashboardData();
+    });
   }
 }
