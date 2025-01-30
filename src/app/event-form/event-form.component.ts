@@ -99,10 +99,23 @@ export class EventFormComponent implements OnInit, AfterViewInit {
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
+    const maxSize = 10 * 1024 * 1024;
+
     if (file) {
+      if (file.size > maxSize) {
+        this.errorMessage = 'Image size must be less than 10MB';
+        const fileInput = event.target as HTMLInputElement;
+        fileInput.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         this.event.image = reader.result as string;
+        this.errorMessage = '';
+      };
+      reader.onerror = () => {
+        this.errorMessage = 'Error reading file';
       };
       reader.readAsDataURL(file);
     }

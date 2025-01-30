@@ -101,6 +101,7 @@ export class RegisterComponent implements AfterViewInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.avatarPreview = e.target.result;
+        this.user.avatar = e.target.result;
       };
       reader.readAsDataURL(file);
     }

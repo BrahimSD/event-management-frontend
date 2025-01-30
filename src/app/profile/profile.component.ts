@@ -57,7 +57,7 @@ export class ProfileComponent implements OnInit {
   saveChanges() {
     if (this.user) {
       this.userService.updateUser(this.user).subscribe({
-        next: (updatedUser: UserProfile) => {
+        next: (updatedUser) => {
           this.user = updatedUser;
           this.isEditing = false;
           this.authService.updateUserInfo({
@@ -82,9 +82,9 @@ export class ProfileComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        if (this.user && e.target?.result) {
-          this.user.avatar = e.target.result as string;
+      reader.onload = (e: any) => {
+        if (this.user) {
+          this.user.avatar = e.target.result;
         }
       };
       reader.readAsDataURL(file);

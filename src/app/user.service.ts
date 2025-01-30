@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable ,catchError} from "rxjs";
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { User, FollowResponse } from "./user.interface";
 
 
@@ -13,6 +13,16 @@ export class UserService {
   private profileUpdateSubject = new BehaviorSubject<boolean>(false);
   
   constructor(private http: HttpClient) {}
+
+    updateProfile(userData: any): Observable<any> {
+    const username = userData.username;
+    return this.http.put<any>(`${this.apiUrl}/${username}/profile`, userData).pipe(
+      tap(updatedUser => {
+        // Notifier les autres composants du changement de profil
+        this.notifyProfileUpdate();
+      })
+    );
+  }
 
   getUserAvatar(username: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${username}/avatar`).pipe(

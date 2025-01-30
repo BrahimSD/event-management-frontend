@@ -62,8 +62,17 @@
 
       .error-message {
         color: #dc3545;
-        font-size: 0.8rem;
-        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      
+        &::before {
+          content: '\f071';
+          font-family: 'Font Awesome 5 Free';
+          font-weight: 900;
+        }
       }
     }
 
@@ -142,6 +151,11 @@
     &:hover {
       background-color: #e9ecef;
       border-color: #3498db;
+    }
+
+    span {
+      font-size: 0.9rem;
+      color: #666;
     }
   }
 

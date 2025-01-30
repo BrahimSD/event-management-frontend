@@ -65,8 +65,11 @@
         <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" #imageInput>
         <label for="image" class="upload-label">
           <i class="fas fa-cloud-upload-alt"></i>
-          <span>Choose an image</span>
+          <span>Choose an image (max 10MB)</span>
         </label>
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
         <div class="preview-container" *ngIf="event.image">
           <img [src]="event.image" alt="Preview" class="image-preview">
         </div>
