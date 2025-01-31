@@ -3,23 +3,13 @@
     <div class="top-bar">
       <div class="left-section">
         <div class="logo">
-          <i class="fas fa-calendar-alt"></i>
-          <span>Event<strong>MBDS</strong></span>
+          <img src="assets/logo.png" alt="EventMBDS Logo" class="logo-image">
         </div>
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Search events..."
-            [(ngModel)]="searchTerm"
-            (input)="searchEvents()"
-          />
+          <input type="text" placeholder="Search events..." [(ngModel)]="searchTerm" (input)="searchEvents()" />
         </div>
-        <button
-          *ngIf="isOrganizer()"
-          class="create-event-btn"
-          (click)="createEvent()"
-        >
+        <button *ngIf="isOrganizer()" class="create-event-btn" (click)="createEvent()">
           <i class="fas fa-plus"></i> Create New Event
         </button>
       </div>
@@ -32,18 +22,12 @@
           </span>
         </div>
 
-        <div
-          class="profile-menu"
-          (click)="toggleProfileMenu()"
-          [class.active]="showProfileMenu"
-        >
+        <div class="profile-menu" (click)="toggleProfileMenu()" [class.active]="showProfileMenu">
           <div class="profile-icon">
-            <ng-container
-              *ngIf="
+            <ng-container *ngIf="
                 !profileImage || profileImage === 'fas fa-user-circle';
                 else profileAvatar
-              "
-            >
+              ">
               <i class="fas fa-user-circle"></i>
             </ng-container>
             <ng-template #profileAvatar>
@@ -52,12 +36,10 @@
           </div>
           <div class="profile-dropdown" *ngIf="showProfileMenu">
             <div class="profile-header">
-              <ng-container
-                *ngIf="
+              <ng-container *ngIf="
                   !profileImage || profileImage === 'fas fa-user-circle';
                   else dropdownAvatar
-                "
-              >
+                ">
                 <i class="fas fa-user-circle"></i>
               </ng-container>
               <ng-template #dropdownAvatar>
@@ -84,56 +66,39 @@
     <div class="navigation-menu">
       <nav>
         <ul class="main-nav">
-          <li
-            [class.active]="activeTab === 'dashboard'"
-            (click)="setActiveTab('dashboard')"
-          >
+          <li [class.active]="activeTab === 'dashboard'" (click)="setActiveTab('dashboard')">
             <i class="fas fa-home"></i> Dashboard
           </li>
-          <li
-            [class.active]="activeTab === 'events'"
-            (click)="setActiveTab('events')"
-          >
+          <li [class.active]="activeTab === 'events'" (click)="setActiveTab('events')">
             <i class="fas fa-calendar-alt"></i> Events
           </li>
-          <li
-            [class.active]="activeTab === 'people'"
-            (click)="setActiveTab('people')"
-          >
+          <li [class.active]="activeTab === 'people'" (click)="setActiveTab('people')">
             <i class="fas fa-users"></i> People
           </li>
-          <li
-            [class.active]="activeTab === 'messages'"
-            (click)="setActiveTab('messages')"
-          >
+          <li [class.active]="activeTab === 'messages'" (click)="setActiveTab('messages')">
             <i class="fas fa-envelope"></i> Messages
           </li>
-          <li
-            [class.active]="activeTab === 'calendar'"
-            (click)="setActiveTab('calendar')"
-          >
+          <li [class.active]="activeTab === 'calendar'" (click)="setActiveTab('calendar')">
             <i class="fas fa-calendar"></i> Calendar
           </li>
-          <li
-            [class.active]="activeTab === 'settings'"
-            class="settings-menu"
-            [class.active]="showSettingsMenu"
-          >
-            <div class="settings-trigger" (click)="toggleSettingsMenu()">
-              <i class="fas fa-cog"></i> Settings
+          <li [class.active]="activeTab === 'settings'" class="settings-menu" [class.active]="showSettingsMenu"
+            (click)="toggleSettingsMenu()">
+            <div class="settings-trigger">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
               <i class="fas fa-chevron-down"></i>
             </div>
             <div class="settings-dropdown" *ngIf="showSettingsMenu">
               <ul>
-                <li (click)="setActiveTab('profile')">
+                <li (click)="setActiveTab('profile'); $event.stopPropagation()">
                   <i class="fas fa-user-circle"></i>
                   Profile
                 </li>
-                <li (click)="setActiveTab('notifications')">
+                <li (click)="setActiveTab('notifications'); $event.stopPropagation()">
                   <i class="fas fa-bell"></i>
                   Notifications
                 </li>
-                <li (click)="setActiveTab('personal')">
+                <li (click)="setActiveTab('personal'); $event.stopPropagation()">
                   <i class="fas fa-user-cog"></i>
                   Personal
                 </li>
@@ -210,11 +175,7 @@
           <div class="events-grid">
             <div class="event-card" *ngFor="let event of upcomingEvents">
               <div class="event-image">
-                <img
-                  *ngIf="event.image"
-                  [src]="event.image"
-                  alt="{{ event.name }}"
-                />
+                <img *ngIf="event.image" [src]="event.image" alt="{{ event.name }}" />
                 <div class="event-date">
                   <span class="day">{{ event.date | date : "dd" }}</span>
                   <span class="month">{{ event.date | date : "MMM" }}</span>
@@ -228,7 +189,8 @@
                 <div class="event-header">
                   <div class="organizer-info">
                     <div class="organizer-avatar">
-                      <ng-container *ngIf="!getOrganizerAvatar(event.organizer) || getOrganizerAvatar(event.organizer) === 'fas fa-user-circle'; else organizerAvatar">
+                      <ng-container
+                        *ngIf="!getOrganizerAvatar(event.organizer) || getOrganizerAvatar(event.organizer) === 'fas fa-user-circle'; else organizerAvatar">
                         <i class="fas fa-user-circle"></i>
                       </ng-container>
                       <ng-template #organizerAvatar>
@@ -239,43 +201,36 @@
                   </div>
                   <h3>{{ event.name }}</h3>
                 </div>
-              
+
                 <div class="event-info">
                   <p><i class="fas fa-clock"></i> {{ event.time }}</p>
                   <p><i class="fas fa-map-marker-alt"></i> {{ event.location }}</p>
                   <p class="participants">
-                    <i class="fas fa-users"></i> 
+                    <i class="fas fa-users"></i>
                     {{ event.participants?.length || 0 }} attending
                   </p>
                 </div>
-              
+
                 <div class="event-actions">
                   <button class="btn-primary" [routerLink]="['/events', event._id]">
                     View Details
                   </button>
-                  <button 
-                    class="btn-secondary" 
-                    *ngIf="!isRegistered(event)"
-                    (click)="register(event._id)">
+                  <button class="btn-secondary" *ngIf="!isRegistered(event)" (click)="register(event._id)">
                     Register Now
                   </button>
                 </div>
               </div>
             </div>
-            
+
             <div *ngIf="upcomingEvents.length === 0" class="no-events">
               <i class="fas fa-calendar-times"></i>
               <p>No upcoming events available</p>
-              <button
-                *ngIf="isOrganizer()"
-                class="btn-primary"
-                (click)="createEvent()"
-              >
+              <button *ngIf="isOrganizer()" class="btn-primary" (click)="createEvent()">
                 Create Your First Event
               </button>
             </div>
           </div>
-
+          <br><br>
           <!-- Nouvelle section: Événements populaires -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -305,10 +260,7 @@
         <app-calendar></app-calendar>
       </div>
 
-      <div
-        *ngIf="activeTab === 'notifications'"
-        class="notifications-container"
-      >
+      <div *ngIf="activeTab === 'notifications'" class="notifications-container">
         <app-notifications></app-notifications>
       </div>
 

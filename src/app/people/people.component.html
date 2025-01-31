@@ -3,12 +3,12 @@
         <div class="user-card" *ngFor="let user of users">
             <div class="user-info" (click)="showUserDetails(user)">
                 <div class="user-avatar">
-                    <ng-container *ngIf="!user.avatar; else userAvatar">
+                    <ng-container *ngIf="!user.avatar || user.avatar === 'fas fa-user-circle'">
                         <i class="fas fa-user-circle"></i>
                     </ng-container>
-                    <ng-template #userAvatar>
+                    <ng-container *ngIf="user.avatar && user.avatar !== 'fas fa-user-circle'">
                         <img [src]="user.avatar" alt="{{ user.username }}">
-                    </ng-template>
+                    </ng-container>
                 </div>
                 <span class="username">{{ user.username }}</span>
                 <span class="user-role" *ngIf="isCurrentUser(user.username)">(You)</span>
@@ -36,12 +36,12 @@
             <div class="modal-body">
                 <div class="user-profile">
                     <div class="user-avatar-large">
-                        <ng-container *ngIf="!selectedUser.avatar; else selectedUserAvatar">
+                        <ng-container *ngIf="!selectedUser.avatar || selectedUser.avatar === 'fas fa-user-circle'">
                             <i class="fas fa-user-circle"></i>
                         </ng-container>
-                        <ng-template #selectedUserAvatar>
+                        <ng-container *ngIf="selectedUser.avatar && selectedUser.avatar !== 'fas fa-user-circle'">
                             <img [src]="selectedUser.avatar" alt="{{ selectedUser.username }}">
-                        </ng-template>
+                        </ng-container>
                     </div>
                     <h3>{{ selectedUser.username }}'s Profile</h3>
 

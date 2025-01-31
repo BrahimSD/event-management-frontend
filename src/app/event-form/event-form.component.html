@@ -40,15 +40,8 @@
     <div class="form-group location-group">
       <label for="location">Location</label>
       <div class="location-input-wrapper">
-        <input 
-          type="text" 
-          id="location" 
-          [(ngModel)]="event.location" 
-          name="location" 
-          required 
-          #location="ngModel"
-          placeholder="Search for a location in France"
-          autocomplete="off">
+        <input type="text" id="location" [(ngModel)]="event.location" name="location" required #location="ngModel"
+          placeholder="Search for a location in France" autocomplete="off">
         <button type="button" class="auto-locate-btn" (click)="getCurrentLocation()" title="Use current location">
           <i class="fas fa-location-arrow"></i>
         </button>

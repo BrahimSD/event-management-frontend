@@ -209,6 +209,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.showProfileMenu = false;
     this.showSettingsMenu = false;
+    this.router.navigate(['dashboard', tab]);
     if (tab === 'profile') {
       this.refreshProfile();
     }
