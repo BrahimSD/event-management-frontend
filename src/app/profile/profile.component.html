@@ -1,62 +1,78 @@
 <div class="profile-container">
-    <div class="profile-header">
-      <div class="avatar-section">
-        <div class="avatar-wrapper">
-          <ng-container *ngIf="!user?.avatar || user?.avatar === 'fas fa-user-circle'; else userAvatar">
-            <i class="fas fa-user-circle"></i>
-          </ng-container>
-          <ng-template #userAvatar>
-            <img [src]="user?.avatar" alt="Profile avatar">
-          </ng-template>
-        </div>
-        <button class="edit-avatar-btn" (click)="editAvatar.click()" *ngIf="isEditing">
-          <i class="fas fa-camera"></i>
-        </button>
-        <input
-          #editAvatar
-          type="file"
-          hidden
-          (change)="onAvatarSelected($event)"
-          accept="image/*">
+  <div class="profile-header">
+    <div class="avatar-section">
+      <div class="avatar-wrapper">
+        <ng-container *ngIf="!user?.avatar || user?.avatar === 'fas fa-user-circle'; else userAvatar">
+          <i class="fas fa-user-circle"></i>
+        </ng-container>
+        <ng-template #userAvatar>
+          <img [src]="user?.avatar" alt="Profile avatar">
+        </ng-template>
       </div>
-  
-      <div class="profile-info">
-        <div class="info-group">
-            <h2>{{ user?.username }}</h2>
+      <label class="edit-avatar-btn" for="avatar-input">
+        <i class="fas fa-camera"></i>
+      </label>
+      <input
+        id="avatar-input"
+        type="file"
+        hidden
+        (change)="onAvatarSelected($event)"
+        accept="image/*"
+      />
+    </div>
+
+    <div class="profile-info">
+      <div class="info-group">
+        <h2>{{ user?.username }}</h2>
+        <span class="user-role">{{ user?.role }}</span>
+      </div>
+
+      <div class="info-group">
+        <div class="location-wrapper">
+          <i class="fas fa-map-marker-alt"></i>
+          <input
+            type="text"
+            [(ngModel)]="user!.location"
+            placeholder="Add location"
+          />
+          <button class="auto-locate-btn" (click)="getCurrentLocation()">
+            <i class="fas fa-location-arrow"></i>
+          </button>
         </div>
-  
-        <div class="info-group">
-          <div class="location-wrapper">
-            <i class="fas fa-map-marker-alt"></i>
-            <span *ngIf="!isEditing">{{ user?.location || 'Add location' }}</span>
-            <div *ngIf="isEditing && user" class="location-input-wrapper">
-              <input 
-                type="text" 
-                [(ngModel)]="user!.location" 
-                placeholder="Location"
-                id="location">
-              <button type="button" class="auto-locate-btn" (click)="getCurrentLocation()">
-                <i class="fas fa-location-arrow"></i>
-              </button>
-            </div>
-          </div>
+      </div>
+
+      <div class="info-group">
+        <div class="email-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input type="email" [value]="user?.email" disabled />
         </div>
-  
-        <button class="edit-btn" (click)="onEditClick()">
-          <i class="fas" [class.fa-edit]="!isEditing" [class.fa-save]="isEditing"></i>
-          {{ isEditing ? 'Save Changes' : 'Edit Profile' }}
-        </button>
+      </div>
+
+      <div class="info-group">
+        <div class="password-wrapper">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            [(ngModel)]="user!.password"
+            placeholder="Change password"
+          />
+        </div>
       </div>
     </div>
-  
-    <div class="profile-about">
-      <h3>About</h3>
-      <p *ngIf="!isEditing">{{ user?.about || 'No description provided.' }}</p>
-      <textarea 
-        *ngIf="isEditing && user" 
-        [(ngModel)]="user!.about" 
-        placeholder="Tell us about yourself"></textarea>
-    </div>
-  
-    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </div>
+
+  <div class="profile-about">
+    <h3>About</h3>
+    <textarea
+      [(ngModel)]="user!.about"
+      placeholder="Tell us about yourself"
+    ></textarea>
+  </div>
+
+  <button class="save-btn" (click)="saveChanges()">
+    <i class="fas fa-save"></i>
+    Save Changes
+  </button>
+
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
 </div>

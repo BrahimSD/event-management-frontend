@@ -98,10 +98,6 @@
                   <i class="fas fa-bell"></i>
                   Notifications
                 </li>
-                <li (click)="setActiveTab('personal'); $event.stopPropagation()">
-                  <i class="fas fa-user-cog"></i>
-                  Personal
-                </li>
               </ul>
             </div>
           </li>
@@ -266,10 +262,6 @@
 
       <div *ngIf="activeTab === 'profile'" class="profile-container">
         <app-profile></app-profile>
-      </div>
-
-      <div *ngIf="activeTab === 'personal'" class="settings-container">
-        <app-personal></app-personal>
       </div>
     </div>
   </div>

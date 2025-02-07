@@ -11,7 +11,6 @@ import { PeopleComponent } from '../people/people.component';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { ChatComponent } from '../chat/chat.component';
 import { ProfileComponent } from '../profile/profile.component';
-import { PersonalComponent } from '../personal/personal.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { NotificationService } from '../services/notification.service';
 import { Notification } from '../notification.interface';
@@ -32,7 +31,6 @@ import { Subscription } from 'rxjs';
     CalendarComponent,
     ChatComponent,
     ProfileComponent,
-    PersonalComponent,
     NotificationsComponent,
   ],
 })
@@ -61,6 +59,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private eventService: EventService,
     private userService: UserService,
     private notificationService: NotificationService
@@ -209,13 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.showProfileMenu = false;
     this.showSettingsMenu = false;
-    this.router.navigate(['dashboard', tab]);
-    if (tab === 'profile') {
-      this.refreshProfile();
-    }
-    if (tab === 'notifications') {
-      this.notificationService.refreshNotificationCount();
-    }
+    this.router.navigate([`/${tab}`]);
   }
 
   toggleProfileMenu() {
