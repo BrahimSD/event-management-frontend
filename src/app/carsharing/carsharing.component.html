@@ -1,0 +1,316 @@
+<div class="carsharing-container">
+  <div class="search-bar">
+    <input
+      type="text"
+      [(ngModel)]="searchLocation"
+      (ngModelChange)="filterDrivers()"
+      placeholder="Search by location, event or username"
+    />
+  </div>
+
+  <div class="tabs">
+    <div
+      class="tab"
+      [class.active]="activeTab === 'available'"
+      (click)="setActiveTab('available')"
+    >
+      <i class="fas fa-car"></i> Available Rides
+    </div>
+    <div
+      class="tab"
+      [class.active]="activeTab === 'my-rides'"
+      (click)="setActiveTab('my-rides')"
+    >
+      <i class="fas fa-clipboard-list"></i> My Rides
+    </div>
+    <div
+      class="tab"
+      [class.active]="activeTab === 'my-offerings'"
+      (click)="setActiveTab('my-offerings')"
+    >
+      <i class="fas fa-hands-helping"></i> My Offerings
+    </div>
+  </div>
+
+  <div class="content-wrapper" *ngIf="activeTab === 'available'">
+    <div class="map-container" *ngIf="mapInitialized">
+      <google-map [center]="center" [zoom]="zoom" height="400px" width="100%">
+        <map-marker
+          *ngFor="let marker of markers"
+          [position]="marker.position"
+          [title]="marker.title"
+          [options]="marker.options"
+        >
+        </map-marker>
+      </google-map>
+
+      <div class="route-info" *ngIf="selectedDriver">
+        <div class="route-header">
+          <h3>Route Details</h3>
+          <button class="close-btn" (click)="resetRoute()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="route-details">
+          <div class="route-point">
+            <i class="fas fa-map-marker-alt start"></i>
+            <span>From: {{ selectedDriver.departure }}</span>
+          </div>
+          <div class="route-point">
+            <i class="fas fa-map-marker-alt end"></i>
+            <span
+              >To:
+              {{
+                selectedDriver.eventLocation || selectedDriver.eventName
+              }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drivers-list">
+      <div
+        *ngFor="let driver of filteredDrivers"
+        class="driver-card"
+        [class.selected]="selectedDriver === driver"
+        (click)="centerMapOnDriver(driver)"
+      >
+        <div class="driver-info">
+          <div class="driver-header">
+            <img [src]="driver.avatar" [alt]="driver.username" />
+            <h3>{{ driver.username }}</h3>
+          </div>
+
+          <div class="trip-info">
+            <div class="location-group">
+              <!-- Départ -->
+              <div class="location-item departure">
+                <div class="location-row">
+                  <i class="fas fa-map-marker-alt start"></i>
+                  <div class="location-detail">
+                    <span class="label">From:</span>
+                    <span class="address">{{ driver.departure }}</span>
+                  </div>
+                </div>
+                <div class="time">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ driver.departureTime | date : "medium" }}</span>
+                </div>
+              </div>
+
+              <!-- Flèche -->
+              <div class="arrow">
+                <i class="fas fa-arrow-down"></i>
+              </div>
+
+              <!-- Destination -->
+              <div class="location-item destination">
+                <div class="location-row">
+                  <i class="fas fa-map-marker-alt end"></i>
+                  <div class="location-detail">
+                    <span class="label">Event:</span>
+                    <span class="event-name">{{ driver.eventName }}</span>
+                    <!-- L'adresse de l'événement sous forme conditionnelle -->
+                    <ng-container *ngIf="driver.eventLocation">
+                      <span class="address">{{ driver.eventLocation }}</span>
+                    </ng-container>
+                    <ng-container
+                      *ngIf="
+                        !driver.eventLocation &&
+                        getEventLocation(driver.eventId)
+                      "
+                    >
+                      <span class="address">{{
+                        getEventLocation(driver.eventId)
+                      }}</span>
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="time" *ngIf="driver.eventDate">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{ driver.eventDate | date : "medium" }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-group">
+              <div class="seats">
+                <i class="fas fa-users"></i>
+                <span>{{ getAvailableSeats(driver) }} available seats</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="contact-btn"
+            *ngIf="currentUsername !== driver.username"
+            (click)="contactDriver(driver); $event.stopPropagation()"
+          >
+            <i class="fas fa-paper-plane"></i>
+            Contact Driver
+          </button>
+
+          <button
+            class="join-btn"
+            *ngIf="
+              !isUserJoined(driver._id) && currentUsername !== driver.username
+            "
+            (click)="joinThisRide(driver._id); $event.stopPropagation()"
+          >
+            <i class="fas fa-sign-in-alt"></i>
+            Join Ride
+          </button>
+
+          <button
+            class="leave-btn"
+            *ngIf="isUserJoined(driver._id)"
+            (click)="leaveThisRide(driver._id); $event.stopPropagation()"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+            Leave Ride
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="filteredDrivers.length === 0" class="no-drivers">
+        <i class="fas fa-car-slash"></i>
+        <p>No available rides found</p>
+        <p class="hint">
+          Try adjusting your search or create your own ride offering.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Rides Tab Content -->
+  <div class="content-wrapper" *ngIf="activeTab === 'my-rides'">
+    <div class="my-rides-list">
+      <h3 class="section-title">
+        <i class="fas fa-ticket-alt"></i> Rides I'm Joining
+      </h3>
+
+      <div *ngIf="userRides.length === 0" class="empty-state">
+        <i class="fas fa-car-side"></i>
+        <p>You haven't joined any rides yet</p>
+        <button class="action-btn" (click)="setActiveTab('available')">
+          Find Available Rides
+        </button>
+      </div>
+
+      <div *ngFor="let ride of userRides" class="ride-card">
+        <div class="ride-header">
+          <img [src]="ride.driver.avatar" [alt]="ride.driver.username" />
+          <div class="ride-driver">
+            <h4>{{ ride.driver.username }}</h4>
+            <span class="event-name">{{ ride.eventName }}</span>
+          </div>
+          <div class="event-date">
+            <i class="fas fa-calendar"></i>
+            <span>{{ ride.eventDate | date : "mediumDate" }}</span>
+          </div>
+        </div>
+
+        <div class="ride-details">
+          <div class="detail-item">
+            <i class="fas fa-map-marker-alt start"></i>
+            <span>{{ ride.departureLocation }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-clock"></i>
+            <span>{{ ride.departureTime | date : "shortTime" }}</span>
+          </div>
+        </div>
+
+        <div class="ride-actions">
+          <button
+            class="contact-btn"
+            (click)="contactDriver({ username: ride.driver.username })"
+          >
+            <i class="fas fa-paper-plane"></i>
+            Message Driver
+          </button>
+
+          <button class="leave-btn" (click)="leaveThisRide(ride._id)">
+            <i class="fas fa-sign-out-alt"></i>
+            Leave Ride
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Offerings Tab Content -->
+  <div class="content-wrapper" *ngIf="activeTab === 'my-offerings'">
+    <div class="my-offerings-list">
+      <h3 class="section-title">
+        <i class="fas fa-car"></i> My Ride Offerings
+      </h3>
+
+      <div *ngIf="userCarSharings.length === 0" class="empty-state">
+        <i class="fas fa-car-alt"></i>
+        <p>You haven't offered any rides yet</p>
+        <button class="action-btn" routerLink="/profile">Offer a Ride</button>
+      </div>
+
+      <div *ngFor="let offer of userCarSharings" class="offer-card">
+        <div class="offer-header">
+          <h4>{{ offer.eventName }}</h4>
+          <div class="event-date">
+            <i class="fas fa-calendar"></i>
+            <span>{{ offer.eventDate | date : "mediumDate" }}</span>
+          </div>
+        </div>
+
+        <div class="offer-details">
+          <div class="detail-item">
+            <i class="fas fa-map-marker-alt start"></i>
+            <span>From: {{ offer.departureLocation }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-clock"></i>
+            <span
+              >Departure: {{ offer.departureTime | date : "shortTime" }}</span
+            >
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-users"></i>
+            <span
+              >{{ offer.seats }} seats |
+              {{ offer.passengers?.length || 0 }} taken</span
+            >
+          </div>
+        </div>
+
+        <div class="passengers-list" *ngIf="offer.passengers?.length > 0">
+          <h5>Passengers:</h5>
+          <div
+            class="passenger-item"
+            *ngFor="let passenger of offer.passengers"
+          >
+            <img [src]="passenger.avatar" [alt]="passenger.username" />
+            <span>{{ passenger.username }}</span>
+            <button
+              class="message-btn"
+              (click)="contactDriver({ username: passenger.username })"
+            >
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="offer-actions">
+          <button class="edit-btn" routerLink="/profile">
+            <i class="fas fa-edit"></i>
+            Edit
+          </button>
+
+          <button class="delete-btn" (click)="deleteOffer(offer.eventId)">
+            <i class="fas fa-trash"></i>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

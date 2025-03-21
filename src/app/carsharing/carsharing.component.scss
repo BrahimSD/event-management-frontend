@@ -1,0 +1,789 @@
+.carsharing-container {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .search-bar {
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #f0f0f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      
+      &:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.1);
+      }
+    }
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+    
+    .tab {
+      padding: 12px 20px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #666;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      
+      i {
+        color: #f39c12;
+      }
+      
+      &:hover {
+        background-color: #e9ecef;
+        color: #333;
+      }
+      
+      &.active {
+        background-color: #f39c12;
+        color: white;
+        
+        i {
+          color: white;
+        }
+      }
+    }
+  }
+
+  .content-wrapper {
+    display: flex;
+    gap: 25px;
+    height: calc(100% - 120px);
+
+    .map-container {
+      flex: 1;
+      height: 100%;
+      min-height: 400px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+
+      .route-info {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        width: calc(100% - 40px);
+        max-width: 400px;
+        z-index: 10;
+
+        .route-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+
+          h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 600;
+          }
+
+          .close-btn {
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.2s;
+
+            &:hover {
+              color: #e74c3c;
+            }
+          }
+        }
+
+        .route-details {
+          .route-point {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            color: #34495e;
+            font-size: 0.95rem;
+            
+            i {
+              &.start {
+                color: #27ae60;
+              }
+              &.end {
+                color: #e74c3c;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .drivers-list, .my-rides-list, .my-offerings-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+
+      .driver-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+
+        &.selected {
+          border-color: #f39c12;
+          background: rgba(243, 156, 18, 0.05);
+        }
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+          border-color: #f39c12;
+        }
+
+        .driver-info {
+          .driver-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+
+            img {
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 3px solid #f39c12;
+              box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+            }
+
+            h3 {
+              margin: 0;
+              color: #2c3e50;
+              font-size: 1.2rem;
+              font-weight: 600;
+            }
+          }
+
+          .trip-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+
+            .location-group {
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+
+              .location-item {
+                background: white;
+                padding: 12px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+                &.departure {
+                  border-left: 4px solid #27ae60;
+                }
+
+                &.destination {
+                  border-left: 4px solid #e74c3c;
+                }
+
+                .location-row {
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 12px;
+                  margin: 0;
+                  color: #34495e;
+                  font-size: 0.95rem;
+
+                  i {
+                    margin-top: 4px;
+                    flex-shrink: 0;
+                    &.start {
+                      color: #27ae60;
+                    }
+                    &.end {
+                      color: #e74c3c;
+                    }
+                  }
+
+                  .location-detail {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    flex: 1;
+                    overflow-wrap: break-word;
+                    word-break: break-all;
+
+                    .label {
+                      font-size: 0.85rem;
+                      color: #7f8c8d;
+                      text-transform: uppercase;
+                      letter-spacing: 0.5px;
+                    }
+
+                    .event-name {
+                      font-weight: 600;
+                      color: #2c3e50;
+                    }
+
+                    .address {
+                      color: #34495e;
+                      font-size: 0.9rem;
+                      margin-top: 2px;
+                      max-width: 100%;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
+                }
+
+                .time {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  margin-top: 8px;
+                  margin-left: 28px;
+                  color: #7f8c8d;
+                  font-size: 0.85rem;
+
+                  i {
+                    font-size: 0.9rem;
+                    &.fa-clock {
+                      color: #2ecc71;
+                    }
+                    &.fa-calendar {
+                      color: #9b59b6;
+                    }
+                  }
+                }
+              }
+
+              .arrow {
+                display: flex;
+                justify-content: center;
+                color: #95a5a6;
+                padding: 5px 0;
+
+                i {
+                  background: white;
+                  width: 30px;
+                  height: 30px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 50%;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                }
+              }
+            }
+
+            .details-group {
+              margin-top: 15px;
+              padding-top: 15px;
+              border-top: 1px solid #e9ecef;
+              display: flex;
+              justify-content: flex-end;
+
+              .seats {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+                i {
+                  color: #3498db;
+                }
+
+                span {
+                  color: #2c3e50;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
+
+        .contact-btn, .join-btn, .leave-btn {
+          width: 100%;
+          padding: 12px;
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-size: 1rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 10px;
+
+          i {
+            font-size: 1.1rem;
+          }
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+        
+        .contact-btn {
+          background: linear-gradient(135deg, #f39c12, #e67e22);
+          
+          &:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+          }
+        }
+        
+        .join-btn {
+          background: linear-gradient(135deg, #2ecc71, #27ae60);
+          
+          &:hover {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+          }
+        }
+        
+        .leave-btn {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          
+          &:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+          }
+        }
+      }
+    }
+    
+    .no-drivers, .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 20px;
+      text-align: center;
+      
+      i {
+        font-size: 4rem;
+        color: #bdc3c7;
+        margin-bottom: 20px;
+      }
+      
+      p {
+        color: #7f8c8d;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        
+        &.hint {
+          font-size: 0.9rem;
+          max-width: 300px;
+        }
+      }
+      
+      .action-btn {
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+      }
+    }
+  }
+  
+  // Styles pour My Rides
+  .my-rides-list {
+    width: 100%;
+    
+    .section-title {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      i {
+        color: #f39c12;
+      }
+    }
+    
+    .ride-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .ride-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        
+        img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #f39c12;
+        }
+        
+        .ride-driver {
+          flex: 1;
+          
+          h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+          }
+          
+          .event-name {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+          }
+        }
+        
+        .event-date {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+          
+          i {
+            color: #9b59b6;
+          }
+        }
+      }
+      
+      .ride-details {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        
+        .detail-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+          
+          i {
+            &.start {
+              color: #27ae60;
+            }
+            &.end {
+              color: #e74c3c;
+            }
+            &.fa-clock {
+              color: #2ecc71;
+            }
+          }
+          
+          span {
+            font-size: 0.95rem;
+            color: #34495e;
+          }
+        }
+      }
+      
+      .ride-actions {
+        display: flex;
+        gap: 10px;
+        
+        button {
+          flex: 1;
+          padding: 10px;
+          border: none;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          i {
+            font-size: 1rem;
+          }
+          
+          &:hover {
+            transform: translateY(-2px);
+          }
+        }
+        
+        .contact-btn {
+          background: linear-gradient(135deg, #3498db, #2980b9);
+          color: white;
+          
+          &:hover {
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+          }
+        }
+        
+        .leave-btn {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: white;
+          
+          &:hover {
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+          }
+        }
+      }
+    }
+  }
+  
+  // Styles pour My Offerings
+  .my-offerings-list {
+    width: 100%;
+    
+    .section-title {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      i {
+        color: #f39c12;
+      }
+    }
+    
+    .offer-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .offer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        
+        h4 {
+          margin: 0;
+          font-size: 1.2rem;
+          color: #2c3e50;
+        }
+        
+        .event-date {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #7f8c8d;
+          font-size: 0.9rem;
+          
+          i {
+            color: #9b59b6;
+          }
+        }
+      }
+      
+      .offer-details {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        
+        .detail-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 8px;
+          
+          i {
+            &.start {
+              color: #27ae60;
+            }
+            &.fa-clock {
+              color: #2ecc71;
+            }
+            &.fa-users {
+              color: #3498db;
+            }
+          }
+          
+          span {
+            font-size: 0.95rem;
+            color: #34495e;
+          }
+        }
+      }
+      
+      .passengers-list {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        
+        h5 {
+          color: #2c3e50;
+          margin-bottom: 10px;
+          font-size: 1rem;
+        }
+        
+        .passenger-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px;
+          background: #f8f9fa;
+          border-radius: 8px;
+          margin-bottom: 8px;
+          
+          img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+          
+          span {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #2c3e50;
+          }
+          
+          .message-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: rgba(52, 152, 219, 0.1);
+              color: #2980b9;
+            }
+          }
+        }
+      }
+      
+      .offer-actions {
+        display: flex;
+        gap: 10px;
+        
+        button {
+          flex: 1;
+          padding: 10px;
+          border: none;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          i {
+            font-size: 1rem;
+          }
+          
+          &:hover {
+            transform: translateY(-2px);
+          }
+        }
+        
+        .edit-btn {
+          background: linear-gradient(135deg, #f1c40f, #f39c12);
+          color: white;
+          
+          &:hover {
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+          }
+        }
+        
+        .delete-btn {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: white;
+          
+          &:hover {
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styles responsifs
+@media (max-width: 1024px) {
+  .carsharing-container {
+    .content-wrapper {
+      flex-direction: column;
+      height: auto;
+      
+      .map-container {
+        min-height: 300px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .carsharing-container {
+    .tabs {
+      .tab {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

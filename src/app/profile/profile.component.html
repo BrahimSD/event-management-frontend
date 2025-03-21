@@ -2,11 +2,16 @@
   <div class="profile-header">
     <div class="avatar-section">
       <div class="avatar-wrapper">
-        <ng-container *ngIf="!user?.avatar || user?.avatar === 'fas fa-user-circle'; else userAvatar">
+        <ng-container
+          *ngIf="
+            !user?.avatar || user?.avatar === 'fas fa-user-circle';
+            else userAvatar
+          "
+        >
           <i class="fas fa-user-circle"></i>
         </ng-container>
         <ng-template #userAvatar>
-          <img [src]="user?.avatar" alt="Profile avatar">
+          <img [src]="user.avatar" alt="Profile avatar" />
         </ng-template>
       </div>
       <label class="edit-avatar-btn" for="avatar-input">
@@ -23,8 +28,8 @@
 
     <div class="profile-info">
       <div class="info-group">
-        <h2>{{ user?.username }}</h2>
-        <span class="user-role">{{ user?.role }}</span>
+        <h2>{{ user.username }}</h2>
+        <span class="user-role">{{ user.role }}</span>
       </div>
 
       <div class="info-group">
@@ -44,7 +49,7 @@
       <div class="info-group">
         <div class="email-wrapper">
           <i class="fas fa-envelope"></i>
-          <input type="email" [value]="user?.email" disabled />
+          <input type="email" [value]="user.email" disabled />
         </div>
       </div>
 
@@ -69,7 +74,105 @@
     ></textarea>
   </div>
 
-  <button class="save-btn" (click)="saveChanges()">
+  <div class="car-settings">
+    <h3><i class="fas fa-car"></i> Car Sharing Settings</h3>
+    
+    <div class="car-option">
+      <label class="switch-label">
+        <span>I want to offer rides to events</span>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" [(ngModel)]="user.hasCar" name="hasCar">
+          <span class="checkbox-slider"></span>
+        </div>
+      </label>
+      <p class="help-text">Enable this option to offer rides to other participants</p>
+    </div>
+  
+    <div *ngIf="user.hasCar" class="car-details">
+      <div class="form-group seats">
+        <label>Available Seats</label>
+        <div class="seats-input">
+          <button 
+            type="button" 
+            (click)="decreaseSeats()" 
+            [disabled]="user.carSettings!.seats <= 1"
+          >
+            <i class="fas fa-minus"></i>
+          </button>
+          <input 
+            type="number" 
+            [(ngModel)]="user.carSettings!.seats" 
+            name="seats"
+            min="1" 
+            max="8"
+            readonly
+          >
+          <button 
+            type="button" 
+            (click)="increaseSeats()" 
+            [disabled]="user.carSettings!.seats >= 8"
+          >
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <p class="help-text">Number of seats available in your car</p>
+      </div>
+  
+      <div class="form-group">
+        <label>Select Event</label>
+        <select [(ngModel)]="selectedEventId" (change)="onEventSelected()" class="event-select">
+          <option value="">-- Select an event you're attending --</option>
+          <option *ngFor="let event of availableEvents" [value]="event._id">
+            {{ event.name }} ({{ event.date | date:'medium' }})
+          </option>
+        </select>
+        <div class="info-message" *ngIf="!availableEvents.length">
+          <i class="fas fa-info-circle"></i>
+          <span>You need to register for upcoming events to offer rides</span>
+        </div>
+      </div>
+  
+      <div class="form-group" *ngIf="selectedEventId">
+        <label>Departure Time</label>
+        <input 
+          type="datetime-local" 
+          [(ngModel)]="user.carSettings!.departureTime" 
+          name="departureTime"
+          class="time-input"
+        >
+        <p class="help-text">When will you start your journey?</p>
+      </div>
+  
+      <div class="form-group">
+        <label>Departure Location</label>
+        <div class="location-input-wrapper">
+          <input 
+            type="text" 
+            #departureLocationInput
+            [(ngModel)]="user.carSettings!.departureLocation" 
+            name="departureLocation"
+            placeholder="Enter your departure location"
+          >
+          <button
+            type="button"
+            class="auto-locate-btn"
+            (click)="getCurrentDepartureLocation()"
+            title="Use current location"
+          >
+            <i class="fas fa-location-arrow"></i>
+          </button>
+        </div>
+        <p class="help-text">Where will you start your journey from?</p>
+      </div>
+  
+      <button class="save-btn primary" (click)="saveUserProfile()">
+        <i class="fas fa-save"></i>
+        Save Car Sharing Settings
+      </button>
+    </div>
+  </div>
+
+  <button class="save-btn" (click)="updateProfile()">
     <i class="fas fa-save"></i>
     Save Changes
   </button>

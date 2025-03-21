@@ -14,6 +14,7 @@ import { ProfileComponent } from '../profile/profile.component';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { NotificationService } from '../services/notification.service';
 import { Notification } from '../notification.interface';
+import { CarsharingComponent } from '../carsharing/carsharing.component';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -32,6 +33,7 @@ import { Subscription } from 'rxjs';
     ChatComponent,
     ProfileComponent,
     NotificationsComponent,
+    CarsharingComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -54,6 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   createdEvents: any[] = [];
   followingCount: number = 0;
   private userAvatars = new Map<string, string>();
+  filteredUsers: any;
 
   constructor(
     private authService: AuthService,
@@ -68,31 +71,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.username = this.authService.getUsername();
     this.profileImage = this.authService.getAvatar();
-    
+
     // Initialiser les notifications une seule fois
     if (!this.notificationInitialized) {
       this.initializeNotifications();
       this.notificationInitialized = true;
     }
-    
+
     this.loadDashboardData();
 
-    this.route.queryParams.subscribe((params: { [key: string]: string }) => {
+    this.route.queryParams.subscribe(params => {
       if (params['tab']) {
         this.setActiveTab(params['tab']);
       }
+  
       if (params['user']) {
-        this.userService.getUserDetails(params['user']).subscribe(user => {
-          this.selectedUser = user;
-        });
+        this.selectUserByUsername(params['user']);
       }
     });
+  }
+  
+  selectUserByUsername(username: string) {
+    const user = this.filteredUsers.find((u: { username: string; }) => u.username === username);
+    if (user) {
+      this.selectedUser = user;
+    }
   }
 
   private initializeNotifications() {
     // Souscrire aux notifications une seule fois
     this.notificationSubscriptions.push(
-      this.notificationService.notificationCount$.subscribe(count => {
+      this.notificationService.notificationCount$.subscribe((count) => {
         this.unreadNotificationsCount = count;
       })
     );
@@ -101,7 +110,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     // Nettoyer toutes les souscriptions
     if (this.notificationSubscriptions) {
-      this.notificationSubscriptions.forEach(sub => sub.unsubscribe());
+      this.notificationSubscriptions.forEach((sub) => sub.unsubscribe());
     }
     this.notificationInitialized = false;
     this.notificationService.destroy();
@@ -208,7 +217,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.showProfileMenu = false;
     this.showSettingsMenu = false;
-    this.router.navigate([`/${tab}`]);
+
+    if (tab === 'messages') {
+      this.router.navigate([tab], {
+        relativeTo: this.route,
+        queryParams: { user: this.route.snapshot.queryParams['user'] },
+        queryParamsHandling: 'merge'
+      });
+    } else {
+      this.router.navigate([tab], {
+        relativeTo: this.route,
+        replaceUrl: true
+      });
+    }
   }
 
   toggleProfileMenu() {
@@ -231,15 +252,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   showEventHistory() {
-    this.setActiveTab('people');
-    const username = this.authService.getUsername();
-    if (username) {
-      this.userService
-        .getUserDetails(username)
-        .subscribe((userDetails: any) => {
-          this.selectedUser = userDetails;
-        });
-    }
+    this.setActiveTab('events');
   }
 
   toggleSettingsMenu() {
@@ -269,4 +282,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.loadDashboardData();
     });
   }
+
+  changeTab(tab: string) {
+    this.setActiveTab(tab);
+  }
+
+  goToEventDetails(eventId: string): void {
+    this.setActiveTab('events');
+    this.router.navigate(['/events', eventId]);
+  }  
 }

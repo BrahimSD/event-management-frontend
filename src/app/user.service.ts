@@ -14,7 +14,7 @@ export class UserService {
   
   constructor(private http: HttpClient) {}
 
-    updateProfile(userData: any): Observable<any> {
+    updateProfile(userData: any, p0: { carSettings: { seats: number; departureLocation: string; departureCoords: { lat: number; lng: number; } | undefined; eventId: string; departureTime: Date | undefined; } | null; username: string; email: string; role: string; password: string; about: string; location: string; avatar: string; createdEvents?: any[]; attendedEvents?: any[]; hasCar: boolean; }): Observable<any> {
     const username = userData.username;
     return this.http.put<any>(`${this.apiUrl}/${username}/profile`, userData).pipe(
       tap(updatedUser => {
@@ -86,5 +86,15 @@ export class UserService {
   
   unfollowUser(username: string): Observable<FollowResponse> {
     return this.http.post<FollowResponse>(`${this.apiUrl}/${username}/unfollow`, {});
+  }
+
+  updateCarSettings(username: string, settings: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${username}/car-settings`, settings)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating car settings:', error);
+          throw error;
+        })
+      );
   }
 }

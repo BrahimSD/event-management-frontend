@@ -11,17 +11,18 @@ import { ProfileComponent } from './profile/profile.component';
 import { ChatComponent } from './chat/chat.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { CarsharingComponent } from './carsharing/carsharing.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { 
-    path: '', 
+  {
+    path: '',
     component: DashboardComponent,
     canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: EventListComponent },
+      { path: 'dashboard', component: EventListComponent }, // Composant par défaut
       { path: 'events', component: EventListComponent },
       { path: 'events/:id', component: EventDetailComponent },
       { path: 'events/:id/edit', component: EventFormComponent },
@@ -30,6 +31,7 @@ export const routes: Routes = [
       { path: 'calendar', component: CalendarComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'carsharing', component: CarsharingComponent },
     ]
   },
   { path: '**', redirectTo: '' }

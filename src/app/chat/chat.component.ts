@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../user.service';
 import { AuthService } from '../auth.service';
 import { ChatService } from '../chat.service';
@@ -45,7 +45,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private authService: AuthService,
     private chatService: ChatService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     const username = this.authService.getUsername();
     this.currentUser = username || '';
@@ -155,12 +156,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loadMessages();
     this.lastReadTimes.set(user.username, new Date());
     this.unreadMessages.set(user.username, 0);
-    // Update URL without navigating
-    window.history.replaceState(
-      {}, 
-      '', 
-      `/dashboard?tab=messages&user=${user.username}`
-    );
+
+    this.router.navigate([], {
+      queryParams: { tab: 'messages', user: user.username },
+      queryParamsHandling: 'merge' // Conserve les autres paramètres existants
+    });
   }
 
   loadUsers() {

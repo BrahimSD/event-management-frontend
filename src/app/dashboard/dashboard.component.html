@@ -3,7 +3,7 @@
     <div class="top-bar">
       <div class="left-section">
         <div class="logo">
-          <img src="assets/logo.png" alt="EventMBDS Logo" class="logo-image">
+          <img src="assets/logo.png" alt="EventMBDS Logo" class="logo-image" />
         </div>
         <div class="search-box">
           <i class="fas fa-search"></i>
@@ -81,6 +81,9 @@
           <li [class.active]="activeTab === 'calendar'" (click)="setActiveTab('calendar')">
             <i class="fas fa-calendar"></i> Calendar
           </li>
+          <li [class.active]="activeTab === 'carsharing'" (click)="changeTab('carsharing')">
+            <i class="fas fa-car"></i> Carsharing
+          </li>
           <li [class.active]="activeTab === 'settings'" class="settings-menu" [class.active]="showSettingsMenu"
             (click)="toggleSettingsMenu()">
             <div class="settings-trigger">
@@ -94,7 +97,9 @@
                   <i class="fas fa-user-circle"></i>
                   Profile
                 </li>
-                <li (click)="setActiveTab('notifications'); $event.stopPropagation()">
+                <li (click)="
+                    setActiveTab('notifications'); $event.stopPropagation()
+                  ">
                   <i class="fas fa-bell"></i>
                   Notifications
                 </li>
@@ -185,12 +190,16 @@
                 <div class="event-header">
                   <div class="organizer-info">
                     <div class="organizer-avatar">
-                      <ng-container
-                        *ngIf="!getOrganizerAvatar(event.organizer) || getOrganizerAvatar(event.organizer) === 'fas fa-user-circle'; else organizerAvatar">
+                      <ng-container *ngIf="
+                          !getOrganizerAvatar(event.organizer) ||
+                            getOrganizerAvatar(event.organizer) ===
+                              'fas fa-user-circle';
+                          else organizerAvatar
+                        ">
                         <i class="fas fa-user-circle"></i>
                       </ng-container>
                       <ng-template #organizerAvatar>
-                        <img [src]="getOrganizerAvatar(event.organizer)" alt="Organizer avatar">
+                        <img [src]="getOrganizerAvatar(event.organizer)" alt="Organizer avatar" />
                       </ng-template>
                     </div>
                     <span class="organizer-name">{{ event.organizer }}</span>
@@ -200,7 +209,9 @@
 
                 <div class="event-info">
                   <p><i class="fas fa-clock"></i> {{ event.time }}</p>
-                  <p><i class="fas fa-map-marker-alt"></i> {{ event.location }}</p>
+                  <p>
+                    <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                  </p>
                   <p class="participants">
                     <i class="fas fa-users"></i>
                     {{ event.participants?.length || 0 }} attending
@@ -208,9 +219,9 @@
                 </div>
 
                 <div class="event-actions">
-                  <button class="btn-primary" [routerLink]="['/events', event._id]">
+                  <button class="btn-primary" (click)="goToEventDetails(event._id)">
                     View Details
-                  </button>
+                  </button>                  
                   <button class="btn-secondary" *ngIf="!isRegistered(event)" (click)="register(event._id)">
                     Register Now
                   </button>
@@ -226,7 +237,7 @@
               </button>
             </div>
           </div>
-          <br><br>
+          <br /><br />
           <!-- Nouvelle section: Événements populaires -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -238,31 +249,7 @@
           </div>
         </div>
       </div>
-
-      <!-- Other Content Sections -->
-      <div *ngIf="activeTab === 'events'" class="events-container">
-        <app-event-list></app-event-list>
-      </div>
-
-      <div *ngIf="activeTab === 'people'" class="people-container">
-        <app-people></app-people>
-      </div>
-
-      <div *ngIf="activeTab === 'messages'" class="messages-container">
-        <app-chat [selectedUser]="selectedUser"></app-chat>
-      </div>
-
-      <div *ngIf="activeTab === 'calendar'" class="calendar-container">
-        <app-calendar></app-calendar>
-      </div>
-
-      <div *ngIf="activeTab === 'notifications'" class="notifications-container">
-        <app-notifications></app-notifications>
-      </div>
-
-      <div *ngIf="activeTab === 'profile'" class="profile-container">
-        <app-profile></app-profile>
-      </div>
+      <router-outlet *ngIf="activeTab !== 'dashboard'"></router-outlet>
     </div>
   </div>
 
