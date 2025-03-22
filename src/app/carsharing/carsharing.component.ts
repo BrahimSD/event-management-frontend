@@ -244,14 +244,18 @@ export class CarsharingComponent implements OnInit {
       .filter((driver) => driver.departure)
       .forEach((driver) => {
         if (driver.departureCoords?.lat && driver.departureCoords?.lng) {
-          this.markers.push({
+          const marker = {
             position: {
               lat: Number(driver.departureCoords.lat),
               lng: Number(driver.departureCoords.lng),
             },
             title: `${driver.username} (départ)`,
-            options: this.markerOptions,
-          });
+            options: {
+              ...this.markerOptions,
+              driverId: driver._id
+            },
+          };
+          this.markers.push(marker);
         } else {
           const geocoder = new google.maps.Geocoder();
           geocoder.geocode(
@@ -263,14 +267,18 @@ export class CarsharingComponent implements OnInit {
                   lat: location.lat(),
                   lng: location.lng()
                 };
-                this.markers.push({
+                const marker = {
                   position: {
                     lat: location.lat(),
                     lng: location.lng(),
                   },
                   title: `${driver.username} (départ)`,
-                  options: this.markerOptions,
-                });
+                  options: {
+                    ...this.markerOptions,
+                    driverId: driver._id
+                  },
+                };
+                this.markers.push(marker);
               }
             }
           );
@@ -279,14 +287,18 @@ export class CarsharingComponent implements OnInit {
         const eventLocation = driver.eventLocation || this.getEventLocation(driver.eventId);
         if (eventLocation) {
           if (driver.eventCoords?.lat && driver.eventCoords?.lng) {
-            this.markers.push({
+            const marker = {
               position: {
                 lat: Number(driver.eventCoords.lat),
                 lng: Number(driver.eventCoords.lng),
               },
               title: `${driver.eventName} (événement)`,
-              options: this.destinationMarkerOptions,
-            });
+              options: {
+                ...this.destinationMarkerOptions,
+                driverId: driver._id
+              },
+            };
+            this.markers.push(marker);
           } else {
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode(
@@ -298,14 +310,18 @@ export class CarsharingComponent implements OnInit {
                     lat: location.lat(),
                     lng: location.lng()
                   };
-                  this.markers.push({
+                  const marker = {
                     position: {
                       lat: location.lat(),
                       lng: location.lng(),
                     },
                     title: `${driver.eventName} (événement)`,
-                    options: this.destinationMarkerOptions,
-                  });
+                    options: {
+                      ...this.destinationMarkerOptions,
+                      driverId: driver._id
+                    },
+                  };
+                  this.markers.push(marker);
                 }
               }
             );
@@ -314,6 +330,16 @@ export class CarsharingComponent implements OnInit {
       });
   }
 
+  onMarkerClick(marker: any) {
+    const driverId = marker.options.driverId;
+    if (driverId) {
+      const driver = this.drivers.find(d => d._id === driverId);
+      if (driver) {
+        this.centerMapOnDriver(driver);
+      }
+    }
+  }
+  
   centerMapOnDriver(driver: Driver) {
     this.selectedDriver = driver;
     

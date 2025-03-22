@@ -34,12 +34,19 @@
 
   <div class="content-wrapper" *ngIf="activeTab === 'available'">
     <div class="map-container" *ngIf="mapInitialized">
-      <google-map [center]="center" [zoom]="zoom" height="400px" width="100%">
+      <google-map
+        [center]="center"
+        [zoom]="zoom"
+        height="400px"
+        width="100%"
+        (mapInitialized)="onMapInit($event)"
+      >
         <map-marker
           *ngFor="let marker of markers"
           [position]="marker.position"
           [title]="marker.title"
           [options]="marker.options"
+          (mapClick)="onMarkerClick(marker)"
         >
         </map-marker>
       </google-map>
