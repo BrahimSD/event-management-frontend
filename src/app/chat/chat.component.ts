@@ -6,6 +6,7 @@ import { UserService } from '../user.service';
 import { AuthService } from '../auth.service';
 import { ChatService } from '../chat.service';
 import { Socket, io } from 'socket.io-client';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-chat',
@@ -50,7 +51,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   ) {
     const username = this.authService.getUsername();
     this.currentUser = username || '';
-    this.socket = io('http://localhost:3000/chat', {
+    this.socket = io(`${environment.apiBase}/chat`, {
       withCredentials: true,
       transports: ['websocket']
     });

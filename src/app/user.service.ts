@@ -3,13 +3,14 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable ,catchError} from "rxjs";
 import { map, tap } from 'rxjs/operators';
 import { User, FollowResponse } from "./user.interface";
+import { environment } from "../environments/environment";
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:3000/users';
+  private apiUrl = `${environment.apiBase}/users`;
   private profileUpdateSubject = new BehaviorSubject<boolean>(false);
   
   constructor(private http: HttpClient) {}

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../auth.service';
 
@@ -38,7 +39,7 @@ export interface Driver {
   providedIn: 'root',
 })
 export class CarsharingService {
-  private apiUrl = 'http://localhost:3000/carsharing';
+  private apiUrl = `${environment.apiBase}/carsharing`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

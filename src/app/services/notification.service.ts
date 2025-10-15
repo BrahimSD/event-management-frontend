@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { Notification } from '../notification.interface';
 import { io, Socket } from 'socket.io-client';
+import { environment } from '../../environments/environment';
 
 interface NotificationSettings {
   eventReminders: boolean;
@@ -15,7 +16,7 @@ interface NotificationSettings {
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:3000/notifications';
+  private apiUrl = `${environment.apiBase}/notifications`;
   private socket: Socket;
   private notificationCountSubject = new BehaviorSubject<number>(0);
   notificationCount$ = this.notificationCountSubject.asObservable();
@@ -24,7 +25,7 @@ export class NotificationService {
     private http: HttpClient,
     private authService: AuthService
   ) {
-    this.socket = io('http://localhost:3000/notifications');
+    this.socket = io(`${environment.apiBase}/notifications`);
     this.setupSocketConnection();
   }
 

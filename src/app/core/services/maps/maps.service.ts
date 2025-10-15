@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 interface WindowWithCallbacks extends Window {
   [key: string]: any;
@@ -14,7 +15,7 @@ declare const window: WindowWithCallbacks;
 export class MapsService {
   private loaded = false;
   private loading: Promise<void> | null = null;
-  private apiUrl = 'http://localhost:3000/config';
+  private apiUrl = `${environment.apiBase}/config`;
 
   constructor(private http: HttpClient) {}
 
