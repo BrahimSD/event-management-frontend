@@ -1,6 +1,6 @@
 [build]
   command = "npm install --legacy-peer-deps && npm run build -- --configuration production"
-  publish = "dist/event-management-frontend"
+  publish = "dist/frontend/browser"
 
-[build.environment]
-  NODE_VERSION = "18"
+[[plugins]]
+  package = "@netlify/angular-runtime"
